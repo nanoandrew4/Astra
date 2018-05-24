@@ -33,4 +33,8 @@ public class Char {
 	public void setChar(char c) {
 		ch.setText(String.valueOf(c));
 	}
+
+	public void flipChar() {
+		ch.setRotate(ch.getRotate() == 180.0 ? 0.0 : 180.0);
+	}
 }

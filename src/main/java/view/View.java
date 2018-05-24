@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import view.drawables.Menu;
+import view.drawables.TextBox;
 import view.screen.Screen;
 
 import java.io.InputStream;
@@ -42,6 +43,15 @@ public class View extends Application {
 		menu.draw();
 		scene.setOnKeyPressed(menu.getKeyHandler());
 		*/
+
+		ArrayList<String> bList = new ArrayList<>();
+		bList.add("This would be the first line to be displayed on the screen for testing purposes.");
+		bList.add("We are now on to the second line, hopefully this will be displayed nicely too.");
+		bList.add("Two more to go, although I wonder how the height will be handled...");
+		bList.add("Alright enough! Lets hope it works well.");
+		TextBox box = new TextBox(screen, 100, 30, 12, bList);
+		box.draw();
+		scene.setOnKeyPressed(box.getKeyHandler());
 
 		scene.setFill(Color.BLACK);
 		primaryStage.setScene(scene);

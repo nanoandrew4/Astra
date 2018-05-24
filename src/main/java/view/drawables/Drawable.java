@@ -3,7 +3,7 @@ package view.drawables;
 import view.screen.Screen;
 
 public abstract class Drawable {
-	protected Bounds bounds;
+	protected Bounds borderBounds, textBounds;
 	protected Screen parentScreen;
 
 	protected final static int BORDER_PADDING = 2, MARKER_PADDING = 2, LINE_SPACING = 2;
@@ -17,11 +17,11 @@ public abstract class Drawable {
 	public abstract void remove();
 
 	protected void drawBorders() {
-		for (int y = bounds.getTopLeftY(); y <= bounds.getBottomRightY(); y += (bounds.getBottomRightY() - bounds.getTopRightY()))
-			for (int x = bounds.getTopLeftX() + 1; x < bounds.getTopRightX() - 1; x++)
+		for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y += (borderBounds.getBottomRightY() - borderBounds.getTopRightY()))
+			for (int x = borderBounds.getTopLeftX() + 1; x < borderBounds.getTopRightX(); x++)
 				parentScreen.drawChar(x, y, '-');
-		for (int y = bounds.getTopLeftY(); y <= bounds.getBottomRightY(); y++)
-			for (int x = bounds.getTopLeftX(); x <= bounds.getTopRightX(); x += (bounds.getBottomRightX() - bounds.getTopLeftX() - 1))
+		for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y++)
+			for (int x = borderBounds.getTopLeftX(); x <= borderBounds.getTopRightX(); x += (borderBounds.getBottomRightX() - borderBounds.getTopLeftX()))
 				parentScreen.drawChar(x, y, '|');
 	}
 }

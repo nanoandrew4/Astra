@@ -16,8 +16,8 @@ public class Menu extends Drawable {
 
 	private EventHandler<KeyEvent> keyHandler;
 
-	public Menu(Screen screen, int sx, int sy, List<String> options, int columns) {
-		super(screen);
+	public Menu(Screen parentScreen, int sx, int sy, List<String> options, int columns) {
+		super(parentScreen);
 		this.options = new String[options.size()];
 		this.columns = columns;
 		optionMarkerCoords = new Point[options.size()];
@@ -37,7 +37,7 @@ public class Menu extends Drawable {
 					sy + LINE_SPACING * (s / columns) + BORDER_PADDING);
 		}
 
-		bounds = new Bounds(
+		borderBounds = new Bounds( // TODO: IMPLEMENT USE OF TEXT BOUNDS
 				new Point(sx, sy), new Point(sx + maxStrLength * columns + BORDER_PADDING * 2 + MARKER_PADDING, sy),
 				new Point(
 						sx,
@@ -56,7 +56,7 @@ public class Menu extends Drawable {
 
 		for (int i = 0; i < options.length; i++) {
 			parentScreen.drawText(
-					null, optionMarkerCoords[i].x + MARKER_PADDING,
+					optionMarkerCoords[i].x + MARKER_PADDING,
 					optionMarkerCoords[i].y, options[i]
 			);
 		}
@@ -100,8 +100,8 @@ public class Menu extends Drawable {
 		if (!drawn)
 			return;
 
-		for (int x = bounds.getTopLeftX(); x < bounds.getBottomRightX(); x++)
-			for (int y = bounds.getTopLeftY(); y <= bounds.getBottomRightY(); y++)
+		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getBottomRightX(); x++)
+			for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y++)
 				parentScreen.drawChar(x, y, ' ');
 
 		highlightedOpt = 0;
