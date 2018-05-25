@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class Screen {
 	public static int screenPxWidth, screenPxHeight;
-	private final static int COLUMNS = 208, ROWS = 68;
+	public final static int COLUMNS = 208, ROWS = 68;
 
 	private Char pixels[][];
 
@@ -83,6 +83,14 @@ public class Screen {
 		drawText(x, y, COLUMNS, text);
 	}
 
+	public void setFontColor(int x, int y, Color c) {
+		pixels[x][y].setCharColor(c);
+	}
+
+	public void setBackgroundColor(int x, int y, Color c) {
+		pixels[x][y].setBackgroundColor(c);
+	}
+
 	public void drawText(int x, int y, int maxX, String text) {
 		String[] split = text.split(" ");
 		int xOff = x, yOff = y;
@@ -101,17 +109,6 @@ public class Screen {
 				pixels[xOff++][yOff].setChar(' ');
 		}
 	}
-
-//	public void clearLine(String label) {
-//		StrRecord str = displayedText.get(label);
-//		for (int y = str.sy; y <= str.ey; y++)
-//			for (int x = str.sx; x < str.ex || (x < COLUMNS && y < str.ey - 1); x++) {
-//				pixels[x][y].setChar(' ');
-//				pixels[x][y].setBackgroundColor(Color.BLACK);
-//				pixels[x][y].setCharColor(Color.WHITE);
-//			}
-//		displayedText.remove(label);
-//	}
 
 	public void drawMarker(Point prevMarkerPos, Point newMarkerPos) {
 		drawMarker(prevMarkerPos, newMarkerPos, '>');

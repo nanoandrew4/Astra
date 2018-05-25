@@ -59,4 +59,8 @@ public class Bounds {
 	public int getBottomRightY() {
 		return br.y;
 	}
+
+	public String toString() {
+		return tl.toString() + " -> " + tr.toString() + " -> " + bl.toString() + " -> " + br.toString();
+	}
 }

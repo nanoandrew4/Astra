@@ -48,9 +48,14 @@ public class Menu extends Drawable {
 						sy + (LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0)) + BORDER_PADDING * 2
 				)
 		);
+
+		fitsOnScreen();
 	}
 
 	public void draw() {
+		if (!fitsOnScreen)
+			return;
+
 		drawBorders();
 		parentScreen.drawMarker(null, optionMarkerCoords[0], '>');
 
