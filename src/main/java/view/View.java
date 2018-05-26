@@ -1,14 +1,19 @@
 package view;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import view.drawables.ASCIIRenderer;
 import view.drawables.Menu;
 import view.drawables.TextBox;
 import view.screen.Screen;
+import view.screen.animation.RotateAnimData;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -44,18 +49,26 @@ public class View extends Application {
 		scene.setOnKeyPressed(menu.getKeyHandler());
 		*/
 
-		ArrayList<String> bList = new ArrayList<>();
-		bList.add("This would be the first line to be displayed on the screen for testing purposes.");
-		bList.add("We are now on to the second line, hopefully this will be displayed nicely too.");
-		bList.add("Two more to go, although I wonder how the height will be handled...");
-		bList.add("Alright enough! Lets hope it works well.");
-		TextBox box = new TextBox(screen, 100, 30, 12, bList);
-		box.draw();
-		scene.setOnKeyPressed(box.getKeyHandler());
-
 		scene.setFill(Color.BLACK);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+
+		ASCIIRenderer art = new ASCIIRenderer(screen, 56, 27, "/gfx/logo.gfx");
+		art.setTextColor("/gfx/logo.col", "/palettes/testPalette.bck");
+		art.draw();
+
+		FadeTransition ft = new FadeTransition(Duration.millis(5000), pane);
+		ft.setFromValue(0);
+		ft.setToValue(1);
+		ft.setInterpolator(Interpolator.LINEAR);
+		ft.play();
+		ft.setOnFinished(event -> {
+			RotateAnimData rotateAnimData = new RotateAnimData();
+			rotateAnimData.cycles = 1;
+			rotateAnimData.duration = 3000;
+			rotateAnimData.interpolator = Interpolator.EASE_IN;
+			art.rotateChars(rotateAnimData);
+		});
 	}
 
 	private Font loadGameFont(String urlToRes) {

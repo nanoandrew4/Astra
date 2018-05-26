@@ -1,5 +1,6 @@
 package view.drawables;
 
+import com.sun.istack.internal.NotNull;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import view.screen.Screen;
@@ -16,7 +17,7 @@ public class Menu extends Drawable {
 
 	private EventHandler<KeyEvent> keyHandler;
 
-	public Menu(Screen parentScreen, int sx, int sy, List<String> options, int columns) {
+	public Menu(@NotNull Screen parentScreen, int sx, int sy, @NotNull List<String> options, int columns) {
 		super(parentScreen);
 		this.options = new String[options.size()];
 		this.columns = columns;

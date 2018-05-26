@@ -1,6 +1,10 @@
 package view.drawables;
 
+import com.sun.istack.internal.NotNull;
+import javafx.scene.paint.Color;
+import view.colors.Palette;
 import view.screen.Screen;
+import view.screen.animation.RotateAnimData;
 
 import java.awt.*;
 import java.io.IOException;
@@ -12,9 +16,11 @@ import java.util.List;
 public class ASCIIRenderer extends Drawable {
 
 	private List<String> gfxFile;
-	private List<String> colorFile;
+	private List<String> textColorFile, backgroundColorFile;
 
-	ASCIIRenderer(Screen parentScreen, int x, int y, String gfxFileName) {
+	private Palette textPalette, backgroundPalette;
+
+	public ASCIIRenderer(@NotNull Screen parentScreen, int x, int y, @NotNull String gfxFileName) {
 		super(parentScreen);
 
 		try {
@@ -26,7 +32,7 @@ public class ASCIIRenderer extends Drawable {
 		initRenderer(x, y);
 	}
 
-	ASCIIRenderer(Screen parentScreen, int x, int y, List<String> gfxFile) {
+	public ASCIIRenderer(@NotNull Screen parentScreen, int x, int y, @NotNull List<String> gfxFile) {
 		super(parentScreen);
 		this.gfxFile = gfxFile;
 
@@ -49,13 +55,91 @@ public class ASCIIRenderer extends Drawable {
 		fitsOnScreen();
 	}
 
+	public void setTextColor(@NotNull String textColorFileName, @NotNull String textPaletteFileName) {
+		try {
+			textColorFile = Files.readAllLines(Paths.get(this.getClass().getResource(textColorFileName).toURI()));
+			textPalette = new Palette(textPaletteFileName);
+		} catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void setTextColor(@NotNull List<String> textColor, @NotNull Palette textPalette) {
+		this.textColorFile = textColor;
+		this.textPalette = textPalette;
+	}
+
+	public void setBackgroundColor(@NotNull String backgroundColorFileName, @NotNull String backgroundPaletteFileName) {
+		try {
+			backgroundColorFile = Files.readAllLines(Paths.get(this.getClass().getResource(backgroundColorFileName).toURI()));
+			backgroundPalette = new Palette(backgroundPaletteFileName);
+		} catch (URISyntaxException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void setBackgroundColor(@NotNull List<String> backgroundColorFile, @NotNull Palette backgroundPalette) {
+		this.backgroundColorFile = backgroundColorFile;
+		this.backgroundPalette = backgroundPalette;
+	}
+
 	@Override
 	public void draw() {
+		for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
+			parentScreen.drawText(textBounds.getTopLeftX(), y, gfxFile.get(y - textBounds.getTopLeftY()));
 
+		setColors(textColorFile, textPalette, true);
+		setColors(backgroundColorFile, backgroundPalette, false);
+	}
+
+	private void setColors(List<String> colorFile, Palette palette, boolean textColor) {
+		if (colorFile != null && palette != null) {
+			Color c = Color.WHITE;
+			String s = "";
+
+			if (colorFile.size() == 1 && colorFile.get(0).length() == 1)
+				c = palette.getColor(colorFile.get(0).charAt(0));
+
+			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++) {
+				if (colorFile.get(0).length() > 1 && colorFile.size() > 1)
+					s = colorFile.get(y = textBounds.getTopLeftY());
+				else if (colorFile.size() > 1 && colorFile.get(0).length() == 1)
+					c = palette.getColor(s.charAt(0));
+
+				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++) {
+					if (colorFile.get(0).length() > 1 && colorFile.size() > 1)
+						c = palette.getColor(s.charAt(x - textBounds.getTopLeftX()));
+
+					if (textColor)
+						parentScreen.setFontColor(x, y, c);
+					else
+						parentScreen.setBackgroundColor(x, y, c);
+				}
+			}
+		}
+	}
+
+	public void rotateChars(RotateAnimData rotAnData) {
+		parentScreen.rotateCharsAnim(
+				textBounds.getTopLeftX(), textBounds.getTopRightX(),
+				textBounds.getTopLeftY(), textBounds.getBottomRightY(), rotAnData
+		);
 	}
 
 	@Override
 	public void remove() {
+		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getTopRightX(); x++)
+			for (int y = borderBounds.getTopLeftY(); y < borderBounds.getBottomRightY(); y++)
+				parentScreen.drawChar(x, y, ' ');
 
+		if (textColorFile != null && textPalette != null)
+			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
+				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++)
+					parentScreen.setFontColor(x, y, Color.BLACK);
+
+		if (backgroundColorFile != null && backgroundPalette != null)
+			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
+				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++)
+					parentScreen.setBackgroundColor(x, y, Color.BLACK);
 	}
 }

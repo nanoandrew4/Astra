@@ -1,5 +1,6 @@
 package view.drawables;
 
+import com.sun.istack.internal.NotNull;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -20,7 +21,7 @@ public class TextBox extends Drawable {
 
 	private int lineDisplayed = 0, currLineDisplayed = 0, requestedWidth;
 
-	public TextBox(Screen parentScreen, int x, int y, int requestedWidth, List<String> text) {
+	public TextBox(@NotNull Screen parentScreen, int x, int y, int requestedWidth, @NotNull List<String> text) {
 		super(parentScreen);
 		this.text = text;
 		this.requestedWidth = requestedWidth;
