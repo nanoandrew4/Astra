@@ -135,7 +135,7 @@ public class ASCIIRenderer extends Drawable {
 		if (textColorFile != null && textPalette != null)
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
 				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++)
-					parentScreen.setFontColor(x, y, Color.BLACK);
+					parentScreen.setFontColor(x, y, Color.WHITE);
 
 		if (backgroundColorFile != null && backgroundPalette != null)
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)

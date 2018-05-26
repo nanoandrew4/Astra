@@ -3,6 +3,7 @@ package view;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -11,12 +12,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import view.drawables.ASCIIRenderer;
 import view.drawables.Menu;
-import view.drawables.TextBox;
+import view.drawables.MenuEvent;
 import view.screen.Screen;
 import view.screen.animation.RotateAnimData;
 
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class View extends Application {
 	private Screen screen;
@@ -32,43 +34,72 @@ public class View extends Application {
 		font = loadGameFont("/fonts/SpaceMono-Regular.ttf");
 		screen.initScreen(pane);
 		scene = new Scene(pane, Screen.screenPxWidth, Screen.screenPxHeight);
-		/*
-		ArrayList<String> list = new ArrayList<>();
-		list.add("Option 1");
-		list.add("Option 2");
-		list.add("Option 3");
-		list.add("Option 4");
-		list.add("Option 5");
-		list.add("Option 6");
-		list.add("Option 7");
-		list.add("Option 8");
-		list.add("Option 9");
-		list.add("Option 10");
-		Menu menu = new Menu(screen, 50, 30, list, 3);
-		menu.draw();
-		scene.setOnKeyPressed(menu.getKeyHandler());
-		*/
 
 		scene.setFill(Color.BLACK);
 		primaryStage.setScene(scene);
+		primaryStage.setTitle("Astra");
 		primaryStage.show();
 
-		ASCIIRenderer art = new ASCIIRenderer(screen, 56, 27, "/gfx/logo.gfx");
-		art.setTextColor("/gfx/logo.col", "/palettes/testPalette.bck");
-		art.draw();
+		displayLogo();
+	}
 
-		FadeTransition ft = new FadeTransition(Duration.millis(5000), pane);
-		ft.setFromValue(0);
-		ft.setToValue(1);
-		ft.setInterpolator(Interpolator.LINEAR);
-		ft.play();
-		ft.setOnFinished(event -> {
+	private void displayLogo() {
+		ASCIIRenderer studioLogo = new ASCIIRenderer(screen, 56, 27, "/gfx/logo.gfx");
+		studioLogo.setTextColor("/gfx/logo.col", "/palettes/testPalette.pal");
+		studioLogo.draw();
+
+		FadeTransition fadeIn = new FadeTransition(Duration.millis(4000), pane);
+		fadeIn.setFromValue(0);
+		fadeIn.setToValue(1);
+		fadeIn.setInterpolator(Interpolator.LINEAR);
+		fadeIn.play();
+		fadeIn.setOnFinished(fadeInEvent -> {
 			RotateAnimData rotateAnimData = new RotateAnimData();
 			rotateAnimData.cycles = 1;
 			rotateAnimData.duration = 3000;
 			rotateAnimData.interpolator = Interpolator.EASE_IN;
-			art.rotateChars(rotateAnimData);
+			rotateAnimData.onFinish = rotEvent -> {
+				if (!rotateAnimData.isFinished) {
+					rotateAnimData.isFinished = true;
+					FadeTransition fadeOut = new FadeTransition(Duration.millis(2500), pane);
+					fadeOut.setFromValue(1);
+					fadeOut.setToValue(0);
+					fadeOut.setInterpolator(Interpolator.LINEAR);
+					fadeOut.play();
+					fadeOut.setOnFinished(fadeOutEvent -> {
+						studioLogo.remove();
+						pane.setOpacity(1);
+						displayMainMenu();
+					});
+				}
+			};
+			studioLogo.rotateChars(rotateAnimData);
 		});
+	}
+
+	private void displayMainMenu() {
+		ASCIIRenderer astraLogo = new ASCIIRenderer(screen, 84, 20, "/gfx/astra.gfx");
+		astraLogo.setTextColor("/gfx/astra.col", "/palettes/testPalette.pal");
+		astraLogo.draw();
+
+		List<String> menuOptions = Arrays.asList("Play", "Options", "Exit");
+		List<MenuEvent> events = Arrays.asList(
+				this::play,
+				this::displayOptions,
+				Platform::exit
+		);
+		Menu mainMenu = new Menu(screen, 97, 30, menuOptions, events, 1);
+		mainMenu.setBorderless();
+		mainMenu.draw();
+		scene.setOnKeyPressed(mainMenu.getKeyHandler());
+	}
+
+	private void play() {
+
+	}
+
+	private void displayOptions() {
+
 	}
 
 	private Font loadGameFont(String urlToRes) {

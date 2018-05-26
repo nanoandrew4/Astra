@@ -9,17 +9,20 @@ import java.awt.*;
 import java.util.List;
 
 public class Menu extends Drawable {
-	private String[] options;
+	private List<String> options;
+	private List<MenuEvent> events;
 	private Point[] optionMarkerCoords;
-	private int highlightedOpt = 0, selectedOpt = -1;
+	private int highlightedOpt = 0;
 
 	private int columns;
 
 	private EventHandler<KeyEvent> keyHandler;
 
-	public Menu(@NotNull Screen parentScreen, int sx, int sy, @NotNull List<String> options, int columns) {
+	public Menu(@NotNull Screen parentScreen, int sx, int sy, @NotNull List<String> options,
+				@NotNull List<MenuEvent> events, int columns) {
 		super(parentScreen);
-		this.options = new String[options.size()];
+		this.options = options;
+		this.events = events;
 		this.columns = columns;
 		optionMarkerCoords = new Point[options.size()];
 
@@ -32,22 +35,22 @@ public class Menu extends Drawable {
 		maxStrLength += MARKER_PADDING;
 
 		for (int s = 0; s < options.size(); s++) {
-			String str = options.get(s);
-			this.options[s] = str;
 			optionMarkerCoords[s] = new Point(sx + (s % columns) * maxStrLength + BORDER_PADDING,
 					sy + LINE_SPACING * (s / columns) + BORDER_PADDING);
 		}
 
-		borderBounds = new Bounds( // TODO: IMPLEMENT USE OF TEXT BOUNDS
-				new Point(sx, sy), new Point(sx + maxStrLength * columns + BORDER_PADDING * 2 + MARKER_PADDING, sy),
-				new Point(
-						sx,
-						sy + (LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0)) + BORDER_PADDING * 2
-				),
-				new Point(
-						sx + maxStrLength * columns + BORDER_PADDING * 2 + MARKER_PADDING,
-						sy + (LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0)) + BORDER_PADDING * 2
-				)
+		textBounds = new Bounds(
+				new Point(sx + BORDER_PADDING, sy + BORDER_PADDING),
+				new Point(sx + maxStrLength * columns + BORDER_PADDING + MARKER_PADDING, sy),
+				new Point(sx, sy + (LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0)) + BORDER_PADDING),
+				new Point(sx + maxStrLength * columns + BORDER_PADDING + MARKER_PADDING, sy + (LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0)) + BORDER_PADDING)
+		);
+
+		borderBounds = new Bounds(
+				new Point(sx, sy),
+				new Point(textBounds.getTopRightX() + BORDER_PADDING, sy),
+				new Point(sx, textBounds.getBottomLeftY() + BORDER_PADDING),
+				new Point(textBounds.getBottomRightX() + BORDER_PADDING, textBounds.getBottomRightY() + BORDER_PADDING)
 		);
 
 		fitsOnScreen();
@@ -60,10 +63,10 @@ public class Menu extends Drawable {
 		drawBorders();
 		parentScreen.drawMarker(null, optionMarkerCoords[0], '>');
 
-		for (int i = 0; i < options.length; i++) {
+		for (int i = 0; i < options.size(); i++) {
 			parentScreen.drawText(
 					optionMarkerCoords[i].x + MARKER_PADDING,
-					optionMarkerCoords[i].y, options[i]
+					optionMarkerCoords[i].y, options.get(i)
 			);
 		}
 
@@ -87,15 +90,15 @@ public class Menu extends Drawable {
 					highlightedOpt--;
 					break;
 				case ENTER:
-					selectedOpt = highlightedOpt; // TODO: HOW TO HANDLE SELECTIONS IN MENUS
+					events.get(highlightedOpt).event();
 					return;
 			}
 
-			if (highlightedOpt >= options.length)
+			if (highlightedOpt >= options.size())
 				highlightedOpt = prevOption % columns;
 			else if (highlightedOpt < 0) {
-				highlightedOpt = options.length + prevOption - (options.length % columns);
-				if (highlightedOpt >= options.length)
+				highlightedOpt = options.size() + prevOption - (options.size() % columns);
+				if (highlightedOpt >= options.size())
 					highlightedOpt -= columns;
 			}
 			parentScreen.drawMarker(optionMarkerCoords[prevOption], optionMarkerCoords[highlightedOpt]);

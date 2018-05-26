@@ -1,11 +1,13 @@
 package view.drawables;
 
+import com.sun.istack.internal.NotNull;
+
 import java.awt.*;
 
 public class Bounds {
 	private Point tl, tr, bl, br;
 
-	Bounds(Point tl, Point tr, Point bl, Point br) {
+	Bounds(@NotNull Point tl, @NotNull Point tr, @NotNull Point bl, @NotNull Point br) {
 		this.tl = tl;
 		this.tr = tr;
 		this.bl = bl;

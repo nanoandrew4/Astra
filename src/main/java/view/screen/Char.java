@@ -63,6 +63,7 @@ public class Char {
 		rt.setAxis(axisMap.get(rotAnDat.axis));
 		rt.setCycleCount(rotAnDat.cycles);
 		rt.setInterpolator(rotAnDat.interpolator);
+		rt.setOnFinished(rotAnDat.onFinish);
 		rt.play();
 	}
 }
