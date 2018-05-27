@@ -16,7 +16,7 @@ public class Char {
 	private Text ch;
 	private Rectangle background;
 
-	private static HashMap<Axis, Point3D> axisMap = new HashMap<>();
+	public static HashMap<Axis, Point3D> axisMap = new HashMap<>();
 
 	static {
 		axisMap.put(Axis.X, new Point3D(1, 0, 0));
@@ -57,13 +57,13 @@ public class Char {
 	}
 
 	public void rotateAnimChar(RotateAnimData rotAnDat) {
-		RotateTransition rt = new RotateTransition(Duration.millis(rotAnDat.duration), ch);
-		rt.setFromAngle(rotAnDat.startAngle);
-		rt.setToAngle(rotAnDat.endAngle);
-		rt.setAxis(axisMap.get(rotAnDat.axis));
-		rt.setCycleCount(rotAnDat.cycles);
-		rt.setInterpolator(rotAnDat.interpolator);
-		rt.setOnFinished(rotAnDat.onFinish);
+		RotateTransition rt = new RotateTransition(Duration.millis(rotAnDat.getDurationMillis()), ch);
+		rt.setFromAngle(rotAnDat.getStartAngle());
+		rt.setToAngle(rotAnDat.getEndAngle());
+		rt.setAxis(axisMap.get(rotAnDat.getAxis()));
+		rt.setCycleCount(rotAnDat.getCycles());
+		rt.setInterpolator(rotAnDat.getInterpolator());
+		rt.setOnFinished(rotAnDat.getOnFinish());
 		rt.play();
 	}
 }
