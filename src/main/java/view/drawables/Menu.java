@@ -18,6 +18,16 @@ public class Menu extends Drawable {
 
 	private EventHandler<KeyEvent> keyHandler;
 
+	/**
+	 * Initializes a Menu instance, and determines the bounds for the object for when it is drawn.
+	 *
+	 * @param parentScreen Screen on which the Menu will be rendered
+	 * @param sx Top left X coordinate on which to place the menu
+	 * @param sy Top left Y coordinate on which to place the menu
+	 * @param options List of strings specifying the options to be provided in the menu
+	 * @param events List of events corresponding to what should happen if each entry in the menu is selected
+	 * @param columns Number of columns into which to divide the options
+	 */
 	public Menu(@NotNull Screen parentScreen, int sx, int sy, @NotNull List<String> options,
 				@NotNull List<MenuEvent> events, int columns) {
 		super(parentScreen);
@@ -39,11 +49,17 @@ public class Menu extends Drawable {
 					sy + LINE_SPACING * (s / columns) + BORDER_PADDING);
 		}
 
+		int verticalPadding =
+				LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0);
+
 		textBounds = new Bounds(
 				new Point(sx + BORDER_PADDING, sy + BORDER_PADDING),
 				new Point(sx + maxStrLength * columns + BORDER_PADDING + MARKER_PADDING, sy),
-				new Point(sx, sy + (LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0)) + BORDER_PADDING),
-				new Point(sx + maxStrLength * columns + BORDER_PADDING + MARKER_PADDING, sy + (LINE_SPACING * ((options.size() / columns)) - (options.size() % columns == 0 ? BORDER_PADDING : 0)) + BORDER_PADDING)
+				new Point(sx, sy + verticalPadding + BORDER_PADDING),
+				new Point(
+						sx + maxStrLength * columns + BORDER_PADDING + MARKER_PADDING,
+						verticalPadding + BORDER_PADDING
+				)
 		);
 
 		borderBounds = new Bounds(

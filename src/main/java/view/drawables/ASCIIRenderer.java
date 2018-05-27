@@ -13,13 +13,28 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Loads ASCII graphics stored in files, as well as optionally loading colors and palettes for the characters used to
+ * render the ASCII graphics, and the background on which they are drawn.
+ */
 public class ASCIIRenderer extends Drawable {
 
+	// List of strings that compose the graphics to be drawn
 	private List<String> gfxFile;
+
+	// Lists of colors to be used in coloring the text and background of the graphics
 	private List<String> textColorFile, backgroundColorFile;
 
 	private Palette textPalette, backgroundPalette;
 
+	/**
+	 * Initializes the ASCIIRenderer and loads the desired graphics from the specified file.
+	 *
+	 * @param parentScreen Screen on which the ASCII graphics will be rendered
+	 * @param x            X coordinate at which to place the top left of the graphics
+	 * @param y            Y coordinate at which to place the top left of the graphics
+	 * @param gfxFileName  Path to file in which the desired graphics are stored
+	 */
 	public ASCIIRenderer(@NotNull Screen parentScreen, int x, int y, @NotNull String gfxFileName) {
 		super(parentScreen);
 
@@ -32,6 +47,14 @@ public class ASCIIRenderer extends Drawable {
 		initRenderer(x, y);
 	}
 
+	/**
+	 * Initializes the ASCIIRenderer.
+	 *
+	 * @param parentScreen Screen on which the ASCII graphics will be rendered
+	 * @param x            X coordinate at which to place the top left of the graphics
+	 * @param y            Y coordinate at which to place the top left of the graphics
+	 * @param gfxFile      List of strings representing the desired graphics to be rendered
+	 */
 	public ASCIIRenderer(@NotNull Screen parentScreen, int x, int y, @NotNull List<String> gfxFile) {
 		super(parentScreen);
 		this.gfxFile = gfxFile;
@@ -55,6 +78,14 @@ public class ASCIIRenderer extends Drawable {
 		fitsOnScreen();
 	}
 
+	/**
+	 * Loads the file containing the colors for each pixel of the text with which the graphics will be rendered, as
+	 * characters, as well as the palette with which to determine the specific colors mapped to each character in the
+	 * color file.
+	 *
+	 * @param textColorFileName   Path to file in which the colors for the graphics are stored
+	 * @param textPaletteFileName Path to file in which the palette to be used is
+	 */
 	public void setTextColor(@NotNull String textColorFileName, @NotNull String textPaletteFileName) {
 		try {
 			textColorFile = Files.readAllLines(Paths.get(this.getClass().getResource(textColorFileName).toURI()));
@@ -64,11 +95,26 @@ public class ASCIIRenderer extends Drawable {
 		}
 	}
 
+	/**
+	 * Receives and sets the colors for the text used to render the graphics, as well as the palette with which to
+	 * determine the specific colors mapped to each character in the color file.
+	 *
+	 * @param textColor   List of strings containing the characters that determine the colors of the text with which
+	 *                    the graphics will be rendered
+	 * @param textPalette Palette mapping the colors contained in the textColor list to actual RGB colors
+	 */
 	public void setTextColor(@NotNull List<String> textColor, @NotNull Palette textPalette) {
 		this.textColorFile = textColor;
 		this.textPalette = textPalette;
 	}
 
+	/**
+	 * Loads the file containing the colors for each pixel on which the text will be rendered, as characters, as well
+	 * as the palette with which to determine the specific colors mapped to each character in the color file.
+	 *
+	 * @param backgroundColorFileName Path to file in which the colors for the graphics are stored
+	 * @param backgroundPaletteFileName Path to file in which the palette to be used is
+	 */
 	public void setBackgroundColor(@NotNull String backgroundColorFileName, @NotNull String backgroundPaletteFileName) {
 		try {
 			backgroundColorFile = Files.readAllLines(Paths.get(this.getClass().getResource(backgroundColorFileName).toURI()));
@@ -78,6 +124,13 @@ public class ASCIIRenderer extends Drawable {
 		}
 	}
 
+	/**
+	 * Receives and sets the colors for the background on which the graphics are rendered, as well as the palette with
+	 * which to determine the specific colors mapped to each character in the color file.
+	 *
+	 * @param backgroundColorFile Path to file in which the colors for the graphics are stored
+	 * @param backgroundPalette Path to file in which the palette to be used is
+	 */
 	public void setBackgroundColor(@NotNull List<String> backgroundColorFile, @NotNull Palette backgroundPalette) {
 		this.backgroundColorFile = backgroundColorFile;
 		this.backgroundPalette = backgroundPalette;
@@ -92,6 +145,13 @@ public class ASCIIRenderer extends Drawable {
 		setColors(backgroundColorFile, backgroundPalette, false);
 	}
 
+	/*
+	 * Sets the colors specified in the color file on the individual pixels that make up the graphic.
+	 * Colors can be requested in three ways through color files:
+	 * - Specifying the color for each pixel
+	 * - Specifying the color for the first row, all rows will use the same colors as the first
+	 * - Specifying the color for the first column, all columns will the use the same colors as the first
+	 */
 	private void setColors(List<String> colorFile, Palette palette, boolean textColor) {
 		if (colorFile != null && palette != null) {
 			Color c = Color.WHITE;
@@ -119,6 +179,10 @@ public class ASCIIRenderer extends Drawable {
 		}
 	}
 
+	/**
+	 * Rotates the individual pixels around their individual center coordinate.
+	 * @param rotAnData RotateAnimData object containing the desired options for the rotation animation
+	 */
 	public void rotateChars(RotateAnimData rotAnData) {
 		parentScreen.rotateCharsAnim(
 				textBounds.getTopLeftX(), textBounds.getTopRightX(),

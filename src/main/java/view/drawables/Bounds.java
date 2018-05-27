@@ -4,6 +4,9 @@ import com.sun.istack.internal.NotNull;
 
 import java.awt.*;
 
+/**
+ * Determine the four points by which any Drawable is bounded.
+ */
 public class Bounds {
 	private Point tl, tr, bl, br;
 
