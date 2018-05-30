@@ -103,14 +103,10 @@ public class ASCIIRenderer extends Drawable {
 
 		URL tURL = this.getClass().getResource(fileName + ".tcol");
 		URL bURL = this.getClass().getResource(fileName + ".bcol");
-		if (tURL != null && paletteFileName != null) {
+		if (tURL != null && paletteFileName != null)
 			setTextColor(fileName + ".tcol", paletteFileName);
-			System.out.println("tload");
-		}
-		if (bURL != null && paletteFileName != null) {
+		if (bURL != null && paletteFileName != null)
 			setBackgroundColor(fileName + ".bcol", paletteFileName);
-			System.out.println("bload");
-		}
 	}
 
 	private void initRenderer(int x, int y) {
@@ -221,8 +217,8 @@ public class ASCIIRenderer extends Drawable {
 					if (y < colorFile.size() && colorFile.get(y).length() > 1 && colorFile.size() > 1)
 						c = getColorFromPalette(s.charAt(x - textBounds.getTopLeftX()), textColor);
 
-					if (!textColor)
-						System.out.println(x + " " + y);
+//					if (!textColor)
+//						System.out.println(x + " " + y);
 
 					if (textColor)
 						parentScreen.setFontColor(x, y, c);

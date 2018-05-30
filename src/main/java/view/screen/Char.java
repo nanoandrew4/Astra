@@ -35,7 +35,6 @@ public class Char {
 		background.relocate(x, y);
 
 		ch.setBoundsType(TextBoundsType.VISUAL);
-		background.setBo
 
 		pane.getChildren().addAll(background, ch);
 	}

@@ -33,8 +33,8 @@ public class Screen {
 	}
 
 	public void initScreen(Pane pane) {
-		double width = computeTextWidth();
-		double height = View.font.getSize();
+		double width = Math.ceil(computeTextWidth());
+		double height = Math.ceil(View.font.getSize()) + 1;
 
 		double paddingX = 0, paddingY = 0;
 
@@ -47,9 +47,14 @@ public class Screen {
 				paddingY = (screenPxHeight - d) / 4;
 
 		pixels = new Char[COLUMNS][ROWS];
-		for (int x = 0; x < pixels.length; x++)
-			for (int y = 0; y < pixels[0].length; y++)
-				pixels[x][y] = new Char(pane, paddingX + x * width, paddingY + y * height, width, height);
+		for (int i = 0; i < COLUMNS; i++)
+			for (int j = 0; j < ROWS; j++) {
+				double x = Math.ceil(i * width);
+				double y = Math.ceil(j * height);
+				double nx = Math.ceil((i + 1) * width);
+				double ny = Math.ceil((j + 1) * height);
+				pixels[i][j] = new Char(pane, paddingX + x, paddingY + y, nx - x, ny - y);
+			}
 	}
 
 	private double computeTextWidth() {
