@@ -77,12 +77,12 @@ public class Menu extends Drawable {
 			return;
 
 		drawBorders();
-		parentScreen.drawMarker(null, optionMarkerCoords[0], '>');
+		parentScreen.drawMarker(null, 0,optionMarkerCoords[0], '>');
 
 		for (int i = 0; i < options.size(); i++) {
 			parentScreen.drawText(
 					optionMarkerCoords[i].x + MARKER_PADDING,
-					optionMarkerCoords[i].y, options.get(i)
+					optionMarkerCoords[i].y, 0,options.get(i)
 			);
 		}
 
@@ -117,7 +117,7 @@ public class Menu extends Drawable {
 				if (highlightedOpt >= options.size())
 					highlightedOpt -= columns;
 			}
-			parentScreen.drawMarker(optionMarkerCoords[prevOption], optionMarkerCoords[highlightedOpt]);
+			parentScreen.drawMarker(optionMarkerCoords[prevOption], 0, optionMarkerCoords[highlightedOpt]);
 		};
 	}
 
@@ -127,7 +127,7 @@ public class Menu extends Drawable {
 
 		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getBottomRightX(); x++)
 			for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y++)
-				parentScreen.drawChar(x, y, ' ');
+				parentScreen.drawChar(x, y, 0,' ');
 
 		highlightedOpt = 0;
 		drawn = false;

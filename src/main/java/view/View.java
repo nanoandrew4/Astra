@@ -56,7 +56,7 @@ public class View extends Application {
 		return new Menu(screen, x, y, options, events, columns);
 	}
 
-	public Pane getPane () {
+	public Pane getPane() {
 		return pane;
 	}
 
@@ -74,12 +74,14 @@ public class View extends Application {
 	}
 
 	public void resetScreen() {
-		for (int x = 0; x < Screen.COLUMNS; x++)
-			for (int y = 0; y < Screen.ROWS; y++) {
-				screen.drawChar(x, y, ' ');
-				screen.setFontColor(x, y, Color.WHITE);
-				screen.setBackgroundColor(x, y, Color.BLACK);
-			}
+		for (int z = 0; z < screen.getNumOfLayers(); z++)
+			for (int x = 0; x < Screen.COLUMNS; x++)
+				for (int y = 0; y < Screen.ROWS; y++) {
+					screen.drawChar(x, y, z, ' ');
+					screen.setFontColor(x, y, z, Color.WHITE);
+					if (z == 0)
+						screen.setBackgroundColor(x, y, Color.BLACK);
+				}
 	}
 
 	private Font loadGameFont(String urlToRes) {

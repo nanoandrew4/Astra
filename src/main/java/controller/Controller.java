@@ -66,8 +66,6 @@ public class Controller {
 	private void play() {
 		view.resetScreen();
 		ASCIIRenderer testRoom = view.buildASCIIRenderer(0, 0, "/gfx/rooms/test.gfx");
-//		testRoom.setTextColor("/gfx/rooms/test.tcol", "/palettes/testPalette.pal");
-//		testRoom.setBackgroundColor("/gfx/rooms/test.bcol", "/palettes/testPalette.pal");
 
 		testRoom.draw();
 	}

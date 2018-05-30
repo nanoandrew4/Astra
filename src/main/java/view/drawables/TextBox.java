@@ -52,7 +52,7 @@ public class TextBox extends Drawable {
 
 		drawBorders();
 		drawNextLine();
-		parentScreen.flipChar(moreTextBelow);
+		parentScreen.flipChar(moreTextBelow,0);
 
 		keyHandler = event -> {
 			if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE)
@@ -101,27 +101,27 @@ public class TextBox extends Drawable {
 					textBounds.getTopRightX(), text.get(y)
 			);
 		if (currLine.size() > maxLinesDisplayed && currLineDisplayed + maxLinesDisplayed < currLine.size())
-			parentScreen.drawChar(moreTextBelow, '^');
+			parentScreen.drawChar(moreTextBelow, 0,'^');
 		else
-			parentScreen.drawChar(moreTextBelow, ' ');
+			parentScreen.drawChar(moreTextBelow, 0,' ');
 		if (currLine.size() > maxLinesDisplayed && currLineDisplayed > 0)
-			parentScreen.drawChar(moreTextAbove, '^');
+			parentScreen.drawChar(moreTextAbove, 0,'^');
 		else
-			parentScreen.drawChar(moreTextAbove, ' ');
+			parentScreen.drawChar(moreTextAbove, 0,' ');
 	}
 
 	private void removeText() {
 		for (int x = textBounds.getTopLeftX(); x <= textBounds.getTopRightX(); x++)
 			for (int y = textBounds.getTopLeftY(); y <= textBounds.getBottomRightY(); y++)
-				parentScreen.drawChar(x, y, ' ');
+				parentScreen.drawChar(x, y, 0,' ');
 	}
 
 	public void remove() {
 		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getTopRightX(); x++)
 			for (int y = borderBounds.getTopLeftY(); y < borderBounds.getBottomRightY(); y++)
-				parentScreen.drawChar(x, y, ' ');
+				parentScreen.drawChar(x, y, 0,' ');
 
-		parentScreen.flipChar(moreTextBelow);
+		parentScreen.flipChar(moreTextBelow,0);
 	}
 
 	public EventHandler<KeyEvent> getKeyHandler() {

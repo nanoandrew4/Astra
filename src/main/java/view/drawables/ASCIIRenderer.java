@@ -186,7 +186,7 @@ public class ASCIIRenderer extends Drawable {
 	@Override
 	public void draw() {
 		for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
-			parentScreen.drawText(textBounds.getTopLeftX(), y, gfxFile.get(y - textBounds.getTopLeftY()));
+			parentScreen.drawText(textBounds.getTopLeftX(), y, 0, gfxFile.get(y - textBounds.getTopLeftY()));
 
 		setColors(textColorFile, textPalette, true);
 		setColors(backgroundColorFile, backgroundPalette, false);
@@ -214,14 +214,18 @@ public class ASCIIRenderer extends Drawable {
 					c = getColorFromPalette(s.charAt(0), textColor);
 
 				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++) {
-					if (y < colorFile.size() && colorFile.get(y).length() > 1 && colorFile.size() > 1)
-						c = getColorFromPalette(s.charAt(x - textBounds.getTopLeftX()), textColor);
+					if (y < colorFile.size() && colorFile.get(y).length() > 1 && colorFile.size() > 1) {
+						if (x - textBounds.getTopLeftX() >= s.length())
+							c = textColor ? defaultText : defaultBack;
+						else
+							c = getColorFromPalette(s.charAt(x - textBounds.getTopLeftX()), textColor);
+					}
 
 //					if (!textColor)
 //						System.out.println(x + " " + y);
 
 					if (textColor)
-						parentScreen.setFontColor(x, y, c);
+						parentScreen.setFontColor(x, y, 0, c);
 					else
 						parentScreen.setBackgroundColor(x, y, c);
 				}
@@ -243,7 +247,7 @@ public class ASCIIRenderer extends Drawable {
 	public void rotateChars(RotateAnimData rotAnData) {
 		parentScreen.rotateCharsAnim(
 				textBounds.getTopLeftX(), textBounds.getTopRightX(),
-				textBounds.getTopLeftY(), textBounds.getBottomRightY(), rotAnData
+				textBounds.getTopLeftY(), textBounds.getBottomRightY(), 0, rotAnData
 		);
 	}
 
@@ -251,12 +255,12 @@ public class ASCIIRenderer extends Drawable {
 	public void remove() {
 		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getTopRightX(); x++)
 			for (int y = borderBounds.getTopLeftY(); y < borderBounds.getBottomRightY(); y++)
-				parentScreen.drawChar(x, y, ' ');
+				parentScreen.drawChar(x, y, 0,' ');
 
 		if (textColorFile != null && textPalette != null)
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
 				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++)
-					parentScreen.setFontColor(x, y, Color.WHITE);
+					parentScreen.setFontColor(x, y, 0, Color.WHITE);
 
 		if (backgroundColorFile != null && backgroundPalette != null)
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)

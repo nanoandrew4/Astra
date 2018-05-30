@@ -51,10 +51,10 @@ public abstract class Drawable {
 			return;
 		for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y += (borderBounds.getBottomRightY() - borderBounds.getTopRightY()))
 			for (int x = borderBounds.getTopLeftX() + 1; x < borderBounds.getTopRightX(); x++)
-				parentScreen.drawChar(x, y, '-');
+				parentScreen.drawChar(x, y, 0,'-');
 		for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y++)
 			for (int x = borderBounds.getTopLeftX(); x <= borderBounds.getTopRightX(); x += (borderBounds.getBottomRightX() - borderBounds.getTopLeftX()))
-				parentScreen.drawChar(x, y, '|');
+				parentScreen.drawChar(x, y, 0,'|');
 	}
 
 	/**
