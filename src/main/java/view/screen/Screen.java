@@ -19,7 +19,6 @@ public class Screen {
 	private Char pixels[][];
 
 	public Screen() {
-
 		Rectangle2D scrBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
 		screenPxWidth = (int) scrBounds.getWidth();
 		screenPxHeight = (int) scrBounds.getHeight();

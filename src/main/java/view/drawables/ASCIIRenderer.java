@@ -9,8 +9,10 @@ import view.screen.animation.RotateAnimData;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -26,6 +28,8 @@ public class ASCIIRenderer extends Drawable {
 	private List<String> textColorFile, backgroundColorFile;
 
 	private Palette textPalette, backgroundPalette;
+
+	private Color defaultText = Color.WHITE, defaultBack = Color.BLACK;
 
 	/**
 	 * Initializes the ASCIIRenderer and loads the desired graphics from the specified file.
@@ -44,22 +48,69 @@ public class ASCIIRenderer extends Drawable {
 			e.printStackTrace();
 		}
 
+		findAndLoadColorFiles(gfxFileName);
 		initRenderer(x, y);
 	}
 
 	/**
-	 * Initializes the ASCIIRenderer.
+	 * Initializes the ASCIIRenderer and loads the desired graphics from the specified file, and centers it on the
+	 * screen.
 	 *
 	 * @param parentScreen Screen on which the ASCII graphics will be rendered
-	 * @param x            X coordinate at which to place the top left of the graphics
-	 * @param y            Y coordinate at which to place the top left of the graphics
-	 * @param gfxFile      List of strings representing the desired graphics to be rendered
+	 * @param gfxFileName  Path to file in which the desired graphics are stored
 	 */
-	public ASCIIRenderer(@NotNull Screen parentScreen, int x, int y, @NotNull List<String> gfxFile) {
+	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull String gfxFileName) {
 		super(parentScreen);
-		this.gfxFile = gfxFile;
 
-		initRenderer(x, y);
+		try {
+			gfxFile = Files.readAllLines(Paths.get(this.getClass().getResource(gfxFileName).toURI()));
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
+
+		int maxX = 0;
+		for (String aGfxFile : gfxFile)
+			if (aGfxFile.length() > maxX)
+				maxX = aGfxFile.length();
+
+		findAndLoadColorFiles(gfxFileName);
+		initRenderer((Screen.COLUMNS - maxX) / 2, (Screen.ROWS - gfxFile.size()) / 2);
+	}
+
+	private void findAndLoadColorFiles(@NotNull String gfxFileName) {
+		String[] removedFileExt = gfxFileName.split("\\.");
+		String fileName = removedFileExt[0];
+		String paletteFileName = null;
+		LinkedList<String> toBeRemoved = new LinkedList<>();
+
+		for (String aGfxFile : gfxFile) {
+			String[] split = aGfxFile.split(" ");
+			if (split.length > 2 && "using".equals(split[0]) && "palette".equals(split[1]))
+				paletteFileName = "/palettes/" + split[2] + ".pal";
+			else if (split.length > 3 && "using".equals(split[0]) && "default".equals(split[1])) {
+				String[] rgbDefault = split[3].split(",");
+				if ("textcolor".equals(split[2]))
+					defaultText = Color.rgb(Integer.valueOf(rgbDefault[0]), Integer.valueOf(rgbDefault[1]), Integer.valueOf(rgbDefault[2]));
+				else if ("backgroundcolor".equals(split[2]))
+					defaultBack = Color.rgb(Integer.valueOf(rgbDefault[0]), Integer.valueOf(rgbDefault[1]), Integer.valueOf(rgbDefault[2]));
+			} else if (!"".equals(aGfxFile.trim()))
+				break;
+			toBeRemoved.add(aGfxFile);
+		}
+
+		for (String s : toBeRemoved)
+			gfxFile.remove(s);
+
+		URL tURL = this.getClass().getResource(fileName + ".tcol");
+		URL bURL = this.getClass().getResource(fileName + ".bcol");
+		if (tURL != null && paletteFileName != null) {
+			setTextColor(fileName + ".tcol", paletteFileName);
+			System.out.println("tload");
+		}
+		if (bURL != null && paletteFileName != null) {
+			setBackgroundColor(fileName + ".bcol", paletteFileName);
+			System.out.println("bload");
+		}
 	}
 
 	private void initRenderer(int x, int y) {
@@ -112,7 +163,7 @@ public class ASCIIRenderer extends Drawable {
 	 * Loads the file containing the colors for each pixel on which the text will be rendered, as characters, as well
 	 * as the palette with which to determine the specific colors mapped to each character in the color file.
 	 *
-	 * @param backgroundColorFileName Path to file in which the colors for the graphics are stored
+	 * @param backgroundColorFileName   Path to file in which the colors for the graphics are stored
 	 * @param backgroundPaletteFileName Path to file in which the palette to be used is
 	 */
 	public void setBackgroundColor(@NotNull String backgroundColorFileName, @NotNull String backgroundPaletteFileName) {
@@ -129,7 +180,7 @@ public class ASCIIRenderer extends Drawable {
 	 * which to determine the specific colors mapped to each character in the color file.
 	 *
 	 * @param backgroundColorFile Path to file in which the colors for the graphics are stored
-	 * @param backgroundPalette Path to file in which the palette to be used is
+	 * @param backgroundPalette   Path to file in which the palette to be used is
 	 */
 	public void setBackgroundColor(@NotNull List<String> backgroundColorFile, @NotNull Palette backgroundPalette) {
 		this.backgroundColorFile = backgroundColorFile;
@@ -154,21 +205,24 @@ public class ASCIIRenderer extends Drawable {
 	 */
 	private void setColors(List<String> colorFile, Palette palette, boolean textColor) {
 		if (colorFile != null && palette != null) {
-			Color c = Color.WHITE;
+			Color c = textColor ? defaultText : defaultBack;
 			String s = "";
 
 			if (colorFile.size() == 1 && colorFile.get(0).length() == 1)
-				c = palette.getColor(colorFile.get(0).charAt(0));
+				c = getColorFromPalette(colorFile.get(0).charAt(0), textColor);
 
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++) {
-				if (colorFile.get(0).length() > 1 && colorFile.size() > 1)
-					s = colorFile.get(y = textBounds.getTopLeftY());
-				else if (colorFile.size() > 1 && colorFile.get(0).length() == 1)
-					c = palette.getColor(s.charAt(0));
+				if (y < colorFile.size())
+					s = colorFile.get(y);
+				if (colorFile.size() > 1 && colorFile.get(y).length() == 1)
+					c = getColorFromPalette(s.charAt(0), textColor);
 
 				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++) {
-					if (colorFile.get(0).length() > 1 && colorFile.size() > 1)
-						c = palette.getColor(s.charAt(x - textBounds.getTopLeftX()));
+					if (y < colorFile.size() && colorFile.get(y).length() > 1 && colorFile.size() > 1)
+						c = getColorFromPalette(s.charAt(x - textBounds.getTopLeftX()), textColor);
+
+					if (!textColor)
+						System.out.println(x + " " + y);
 
 					if (textColor)
 						parentScreen.setFontColor(x, y, c);
@@ -179,8 +233,15 @@ public class ASCIIRenderer extends Drawable {
 		}
 	}
 
+	private Color getColorFromPalette(char c, boolean textColor) {
+		if (c == ' ')
+			return textColor ? defaultText : defaultBack;
+		return textColor ? textPalette.getColor(c) : backgroundPalette.getColor(c);
+	}
+
 	/**
 	 * Rotates the individual pixels around their individual center coordinate.
+	 *
 	 * @param rotAnData RotateAnimData object containing the desired options for the rotation animation
 	 */
 	public void rotateChars(RotateAnimData rotAnData) {

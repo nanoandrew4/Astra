@@ -6,6 +6,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 import javafx.util.Duration;
 import view.View;
 import view.screen.animation.RotateAnimData;
@@ -32,6 +33,9 @@ public class Char {
 
 		background = new Rectangle(w, h, Color.BLACK);
 		background.relocate(x, y);
+
+		ch.setBoundsType(TextBoundsType.VISUAL);
+		background.setBo
 
 		pane.getChildren().addAll(background, ch);
 	}

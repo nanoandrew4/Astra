@@ -45,6 +45,7 @@ public class Palette {
 
 	/**
 	 * Retrieves a color given a character, used by the engine to draw the appropriate colors when rendering graphics.
+	 *
 	 * @param c Character from color file
 	 * @return Color to be rendered
 	 */

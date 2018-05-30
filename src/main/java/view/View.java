@@ -34,14 +34,16 @@ public class View extends Application {
 	public void start(Stage primaryStage) {
 		pane = new Pane();
 		screen = new Screen();
-		font = loadGameFont("/fonts/SpaceMono-Regular.ttf");
-		screen.initScreen(pane);
 		scene = new Scene(pane, Screen.screenPxWidth, Screen.screenPxHeight);
 
 		scene.setFill(Color.BLACK);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Astra");
 		primaryStage.show();
+
+
+		font = loadGameFont("/fonts/SpaceMono-Regular.ttf");
+		screen.initScreen(pane);
 
 		new Controller(this);
 	}
@@ -69,6 +71,15 @@ public class View extends Application {
 		ft.setInterpolator(fadeAnimData.getInterpolator());
 		ft.setOnFinished(fadeAnimData.getOnFinished());
 		ft.play();
+	}
+
+	public void resetScreen() {
+		for (int x = 0; x < Screen.COLUMNS; x++)
+			for (int y = 0; y < Screen.ROWS; y++) {
+				screen.drawChar(x, y, ' ');
+				screen.setFontColor(x, y, Color.WHITE);
+				screen.setBackgroundColor(x, y, Color.BLACK);
+			}
 	}
 
 	private Font loadGameFont(String urlToRes) {

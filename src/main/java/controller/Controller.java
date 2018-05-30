@@ -21,7 +21,8 @@ public class Controller {
 		this.view = view;
 		model = new Model();
 
-		displayLogo();
+//		displayLogo();
+		displayMainMenu();
 	}
 
 	private void displayLogo() {
@@ -35,7 +36,7 @@ public class Controller {
 						FadeAnimData fadeOut = new FadeAnimData().durationMillis(2500).onFinished(fadeOutEvent -> {
 							studioLogo.remove();
 							view.getPane().setOpacity(1);
-							 displayMainMenu();
+							displayMainMenu();
 						});
 						view.playFadeAnimation(fadeOut, view.getPane());
 					});
@@ -47,7 +48,7 @@ public class Controller {
 
 	private void displayMainMenu() {
 		ASCIIRenderer astraLogo = view.buildASCIIRenderer(84, 20, "/gfx/astra.gfx");
-		astraLogo.setTextColor("/gfx/astra.col", "/palettes/testPalette.pal");
+		astraLogo.setTextColor("/gfx/astra.tcol", "/palettes/testPalette.pal");
 		astraLogo.draw();
 
 		List<String> menuOptions = Arrays.asList("Play", "Options", "Exit");
@@ -63,7 +64,12 @@ public class Controller {
 	}
 
 	private void play() {
+		view.resetScreen();
+		ASCIIRenderer testRoom = view.buildASCIIRenderer(0, 0, "/gfx/rooms/test.gfx");
+//		testRoom.setTextColor("/gfx/rooms/test.tcol", "/palettes/testPalette.pal");
+//		testRoom.setBackgroundColor("/gfx/rooms/test.bcol", "/palettes/testPalette.pal");
 
+		testRoom.draw();
 	}
 
 	private void displayOptions() {
