@@ -1,5 +1,6 @@
 package view.drawables;
 
+import view.screen.Plane;
 import view.screen.Screen;
 
 public abstract class Drawable {
@@ -14,6 +15,8 @@ public abstract class Drawable {
 	 */
 	protected Screen parentScreen;
 
+	protected Plane parentPlane;
+
 	/**
 	 * Pixels of padding for optional use when determining the bounds of objects, or the spacing of them.
 	 */
@@ -22,6 +25,10 @@ public abstract class Drawable {
 
 	Drawable(Screen parentScreen) {
 		this.parentScreen = parentScreen;
+	}
+
+	Drawable(Plane parentPlane) {
+		this.parentPlane = parentPlane;
 	}
 
 	/**
@@ -51,10 +58,10 @@ public abstract class Drawable {
 			return;
 		for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y += (borderBounds.getBottomRightY() - borderBounds.getTopRightY()))
 			for (int x = borderBounds.getTopLeftX() + 1; x < borderBounds.getTopRightX(); x++)
-				parentScreen.drawChar(x, y, 0,'-');
+				parentPlane.drawChar(x, y, 0, '-');
 		for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y++)
 			for (int x = borderBounds.getTopLeftX(); x <= borderBounds.getTopRightX(); x += (borderBounds.getBottomRightX() - borderBounds.getTopLeftX()))
-				parentScreen.drawChar(x, y, 0,'|');
+				parentPlane.drawChar(x, y, 0, '|');
 	}
 
 	/**

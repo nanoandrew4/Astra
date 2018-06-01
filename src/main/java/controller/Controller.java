@@ -2,6 +2,7 @@ package controller;
 
 import javafx.animation.Interpolator;
 import javafx.application.Platform;
+import lvleditor.LevelEditor;
 import model.Model;
 import view.View;
 import view.drawables.ASCIIRenderer;
@@ -47,17 +48,21 @@ public class Controller {
 	}
 
 	private void displayMainMenu() {
-		ASCIIRenderer astraLogo = view.buildASCIIRenderer(84, 20, "/gfx/astra.gfx");
+		ASCIIRenderer astraLogo = view.buildASCIIRenderer(80, 20, "/gfx/astra.gfx");
 		astraLogo.setTextColor("/gfx/astra.tcol", "/palettes/testPalette.pal");
 		astraLogo.draw();
 
-		List<String> menuOptions = Arrays.asList("Play", "Options", "Exit");
+		List<String> menuOptions = Arrays.asList("Play", "Options", "LevelEditor", "Exit");
 		List<MenuEvent> events = Arrays.asList(
 				this::play,
 				this::displayOptions,
+				() -> {
+					view.resetScreen();
+					new LevelEditor(view.getScreen());
+				},
 				Platform::exit
 		);
-		Menu mainMenu = view.buildMenu(97, 30, menuOptions, events, 1);
+		Menu mainMenu = view.buildMenu(90, 30, menuOptions, events, 1);
 		mainMenu.setBorderless();
 		mainMenu.draw();
 		view.getScene().setOnKeyPressed(mainMenu.getKeyHandler());

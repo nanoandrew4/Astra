@@ -18,7 +18,7 @@ import java.awt.Point;
 import java.util.HashMap;
 
 public class Screen {
-	public static int screenPxWidth, screenPxHeight;
+	public static int screenPxWidth, screenPxHeight, fontWidth, fontHeight;
 	public final static int COLUMNS = 208, ROWS = 68;
 
 	private Rectangle[][] backgroundLayer;
@@ -54,26 +54,26 @@ public class Screen {
 	}
 
 	public void initScreen(Pane pane) {
-		double width = Math.ceil(computeTextWidth());
-		double height = Math.ceil(View.font.getSize()) + 1;
+		fontWidth = (int) Math.ceil(computeTextWidth());
+		fontHeight = (int) Math.ceil(View.font.getSize()) + 1;
 
 		double paddingX = 0, paddingY = 0;
 
-		for (double d = 0; d < screenPxWidth; d += width)
-			if (d + width > screenPxWidth)
+		for (double d = 0; d < screenPxWidth; d += fontWidth)
+			if (d + fontWidth > screenPxWidth)
 				paddingX = (screenPxWidth - d) / 2;
 
-		for (double d = 0; d < screenPxHeight; d += height)
-			if (d + height > screenPxHeight)
+		for (double d = 0; d < screenPxHeight; d += fontHeight)
+			if (d + fontHeight > screenPxHeight)
 				paddingY = (screenPxHeight - d) / 4;
 
 		for (int k = 0; k < textLayers[0][0].length; k++)
 			for (int i = 0; i < COLUMNS; i++)
 				for (int j = 0; j < ROWS; j++) {
-					double x = Math.ceil(i * width);
-					double y = Math.ceil(j * height);
-					double nx = Math.ceil((i + 1) * width);
-					double ny = Math.ceil((j + 1) * height);
+					double x = Math.ceil(i * fontWidth);
+					double y = Math.ceil(j * fontHeight);
+					double nx = Math.ceil((i + 1) * fontWidth);
+					double ny = Math.ceil((j + 1) * fontHeight);
 
 					if (k == 0) {
 						backgroundLayer[i][j] = new Rectangle(nx - x, ny - y);
@@ -89,78 +89,24 @@ public class Screen {
 				}
 	}
 
+	public void drawPlane(Plane plane, int planeTX, int planeTY) {
+		for (int k = 0; k < plane.getNumOfLayers(); k++)
+			for (int j = 0; j < ROWS; j++)
+				for (int i = 0; i < COLUMNS; i++) {
+					if (k == 0 && i + planeTX < plane.getWidth() && j + planeTY < plane.getHeight())
+						backgroundLayer[i][j].setFill(plane.getRect(i + planeTX, j + planeTY));
+					Text t = plane.getText(i + planeTX, j + planeTY, k);
+					textLayers[i][j][k].setText(t.getText());
+					textLayers[i][j][k].setFill(t.getFill());
+				}
+	}
+
 	private double computeTextWidth() {
 		Text t = new Text("a");
 		t.setFont(View.font);
 		new Scene(new Group(t));
 		t.applyCss();
 		return t.getLayoutBounds().getWidth();
-	}
-
-	public void drawChar(@NotNull Point p, int layer, char c) {
-		drawChar(p.x, p.y, layer, c);
-	}
-
-	public void drawChar(int x, int y, int layer, char c) {
-		textLayers[x][y][layer].setText(Character.toString(c));
-	}
-
-	public void flipChar(@NotNull Point p, int layer) {
-		flipChar(p.x, p.y, layer);
-	}
-
-	public void flipChar(int x, int y, int layer) {
-		textLayers[x][y][layer].setRotate(textLayers[x][y][layer].getRotate() == 180.0 ? 0.0 : 180.0);
-	}
-
-	public void drawText(@NotNull Point p, int layer, @NotNull String text) {
-		drawText(p.x, p.y, layer, text);
-	}
-
-	public void drawText(int x, int y, int layer, @NotNull String text) {
-		drawText(x, y, layer, COLUMNS, text);
-	}
-
-	public void setFontColor(int x, int y, int layer, @NotNull Color c) {
-		textLayers[x][y][layer].setFill(c);
-	}
-
-	public void setBackgroundColor(@NotNull Point p, @NotNull Color c) {
-		setBackgroundColor(p.x, p.y, c);
-	}
-
-	public void setBackgroundColor(int x, int y, @NotNull Color c) {
-		backgroundLayer[x][y].setFill(c);
-	}
-
-	public void drawText(int x, int y, int layer, int maxX, @NotNull String text) {
-		String[] split = text.split(" ");
-		int xOff = x, yOff = y;
-		for (String str : split) {
-			if (x + str.length() > maxX) {
-				System.err.println("The following text cannot be displayed properly: \"" + text + "\"");
-				break;
-			}
-			if (str.length() + xOff > maxX) {
-				yOff++;
-				xOff = x;
-			}
-
-			for (int p = 0; p < str.length(); p++)
-				textLayers[xOff++][yOff][layer].setText(Character.toString(str.charAt(p)));
-			if (xOff < COLUMNS)
-				textLayers[xOff++][yOff][layer].setText(" ");
-		}
-	}
-
-	public void drawMarker(@NotNull Point prevMarkerPos, int layer, @NotNull Point newMarkerPos) {
-		drawMarker(prevMarkerPos, layer, newMarkerPos, '>');
-	}
-
-	public void drawMarker(@NotNull Point prevMarkerPos, int layer, @NotNull Point newMarkerPos, char symbol) {
-		if (prevMarkerPos != null)
-			textLayers[prevMarkerPos.x][prevMarkerPos.y][layer].setText(" ");
-		textLayers[newMarkerPos.x][newMarkerPos.y][layer].setText(Character.toString(symbol));
 	}
 
 	public void rotateAnimChar(int x, int y, int layer, RotateAnimData rotAnDat) {
@@ -177,7 +123,7 @@ public class Screen {
 	public void rotateCharsAnim(int startX, int endX, int startY, int endY, int layer, RotateAnimData rotAnData) {
 		for (int x = startX; x < endX; x++)
 			for (int y = startY; y < endY; y++)
-				if (!"".equals(textLayers[x][y][layer]))
+				if (!"".equals(textLayers[x][y][layer].getText()))
 					rotateAnimChar(x, y, layer, rotAnData);
 	}
 }

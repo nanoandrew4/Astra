@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import view.screen.Plane;
 import view.screen.Screen;
 
 import java.awt.*;
@@ -21,8 +22,8 @@ public class TextBox extends Drawable {
 
 	private int lineDisplayed = 0, currLineDisplayed = 0, requestedWidth;
 
-	public TextBox(@NotNull Screen parentScreen, int x, int y, int requestedWidth, @NotNull List<String> text) {
-		super(parentScreen);
+	public TextBox(@NotNull Plane parentPlane, int x, int y, int requestedWidth, @NotNull List<String> text) {
+		super(parentPlane);
 		this.text = text;
 		this.requestedWidth = requestedWidth;
 
@@ -52,7 +53,7 @@ public class TextBox extends Drawable {
 
 		drawBorders();
 		drawNextLine();
-		parentScreen.flipChar(moreTextBelow,0);
+		parentPlane.flipChar(moreTextBelow,0);
 
 		keyHandler = event -> {
 			if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE)
@@ -96,32 +97,32 @@ public class TextBox extends Drawable {
 		if (clearText)
 			removeText();
 		for (int y = offset; y < text.size() && y < offset + linesToPrint; y++)
-			parentScreen.drawText(
+			parentPlane.drawText(
 					textBounds.getTopLeftX(), textBounds.getTopLeftY() + (y - offset) * LINE_SPACING,
 					textBounds.getTopRightX(), text.get(y)
 			);
 		if (currLine.size() > maxLinesDisplayed && currLineDisplayed + maxLinesDisplayed < currLine.size())
-			parentScreen.drawChar(moreTextBelow, 0,'^');
+			parentPlane.drawChar(moreTextBelow, 0,'^');
 		else
-			parentScreen.drawChar(moreTextBelow, 0,' ');
+			parentPlane.drawChar(moreTextBelow, 0,' ');
 		if (currLine.size() > maxLinesDisplayed && currLineDisplayed > 0)
-			parentScreen.drawChar(moreTextAbove, 0,'^');
+			parentPlane.drawChar(moreTextAbove, 0,'^');
 		else
-			parentScreen.drawChar(moreTextAbove, 0,' ');
+			parentPlane.drawChar(moreTextAbove, 0,' ');
 	}
 
 	private void removeText() {
 		for (int x = textBounds.getTopLeftX(); x <= textBounds.getTopRightX(); x++)
 			for (int y = textBounds.getTopLeftY(); y <= textBounds.getBottomRightY(); y++)
-				parentScreen.drawChar(x, y, 0,' ');
+				parentPlane.drawChar(x, y, 0,' ');
 	}
 
 	public void remove() {
 		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getTopRightX(); x++)
 			for (int y = borderBounds.getTopLeftY(); y < borderBounds.getBottomRightY(); y++)
-				parentScreen.drawChar(x, y, 0,' ');
+				parentPlane.drawChar(x, y, 0,' ');
 
-		parentScreen.flipChar(moreTextBelow,0);
+		parentPlane.flipChar(moreTextBelow,0);
 	}
 
 	public EventHandler<KeyEvent> getKeyHandler() {

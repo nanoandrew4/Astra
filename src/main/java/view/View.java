@@ -13,6 +13,7 @@ import javafx.util.Duration;
 import view.drawables.ASCIIRenderer;
 import view.drawables.Menu;
 import view.drawables.MenuEvent;
+import view.screen.Plane;
 import view.screen.Screen;
 import view.screen.animation.FadeAnimData;
 
@@ -21,6 +22,7 @@ import java.util.List;
 
 public class View extends Application {
 	private Screen screen;
+	private Plane plane;
 
 	private Scene scene;
 	private Pane pane;
@@ -33,6 +35,7 @@ public class View extends Application {
 
 	public void start(Stage primaryStage) {
 		pane = new Pane();
+		plane = new Plane(Screen.COLUMNS, Screen.ROWS, 3);
 		screen = new Screen();
 		scene = new Scene(pane, Screen.screenPxWidth, Screen.screenPxHeight);
 
@@ -41,23 +44,32 @@ public class View extends Application {
 		primaryStage.setTitle("Astra");
 		primaryStage.show();
 
-
 		font = loadGameFont("/fonts/SpaceMono-Regular.ttf");
 		screen.initScreen(pane);
 
 		new Controller(this);
+
+		screen.drawPlane(plane, 0, 0);
 	}
 
 	public ASCIIRenderer buildASCIIRenderer(int x, int y, String gfxFileName) {
-		return new ASCIIRenderer(screen, x, y, gfxFileName);
+		return new ASCIIRenderer(plane, x, y, gfxFileName);
 	}
 
 	public Menu buildMenu(int x, int y, List<String> options, List<MenuEvent> events, int columns) {
-		return new Menu(screen, x, y, options, events, columns);
+		return new Menu(plane, x, y, options, events, columns);
 	}
 
 	public Pane getPane() {
 		return pane;
+	}
+
+	public Screen getScreen() {
+		return screen;
+	}
+
+	public Plane getPlane() {
+		return plane;
 	}
 
 	public Scene getScene() {
@@ -77,10 +89,10 @@ public class View extends Application {
 		for (int z = 0; z < screen.getNumOfLayers(); z++)
 			for (int x = 0; x < Screen.COLUMNS; x++)
 				for (int y = 0; y < Screen.ROWS; y++) {
-					screen.drawChar(x, y, z, ' ');
-					screen.setFontColor(x, y, z, Color.WHITE);
+					plane.drawChar(x, y, z, ' ');
+					plane.setFontColor(x, y, z, Color.WHITE);
 					if (z == 0)
-						screen.setBackgroundColor(x, y, Color.BLACK);
+						plane.setBackgroundColor(x, y, Color.BLACK);
 				}
 	}
 

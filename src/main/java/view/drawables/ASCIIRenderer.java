@@ -3,6 +3,7 @@ package view.drawables;
 import com.sun.istack.internal.NotNull;
 import javafx.scene.paint.Color;
 import view.colors.Palette;
+import view.screen.Plane;
 import view.screen.Screen;
 import view.screen.animation.RotateAnimData;
 
@@ -34,13 +35,13 @@ public class ASCIIRenderer extends Drawable {
 	/**
 	 * Initializes the ASCIIRenderer and loads the desired graphics from the specified file.
 	 *
-	 * @param parentScreen Screen on which the ASCII graphics will be rendered
+//	 * @param parentScreen Screen on which the ASCII graphics will be rendered
 	 * @param x            X coordinate at which to place the top left of the graphics
 	 * @param y            Y coordinate at which to place the top left of the graphics
 	 * @param gfxFileName  Path to file in which the desired graphics are stored
 	 */
-	public ASCIIRenderer(@NotNull Screen parentScreen, int x, int y, @NotNull String gfxFileName) {
-		super(parentScreen);
+	public ASCIIRenderer(@NotNull Plane parentPlane, int x, int y, @NotNull String gfxFileName) {
+		super(parentPlane);
 
 		try {
 			gfxFile = Files.readAllLines(Paths.get(this.getClass().getResource(gfxFileName).toURI()));
@@ -186,7 +187,7 @@ public class ASCIIRenderer extends Drawable {
 	@Override
 	public void draw() {
 		for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
-			parentScreen.drawText(textBounds.getTopLeftX(), y, 0, gfxFile.get(y - textBounds.getTopLeftY()));
+			parentPlane.drawText(textBounds.getTopLeftX(), y, 0, gfxFile.get(y - textBounds.getTopLeftY()));
 
 		setColors(textColorFile, textPalette, true);
 		setColors(backgroundColorFile, backgroundPalette, false);
@@ -225,9 +226,9 @@ public class ASCIIRenderer extends Drawable {
 //						System.out.println(x + " " + y);
 
 					if (textColor)
-						parentScreen.setFontColor(x, y, 0, c);
+						parentPlane.setFontColor(x, y, 0, c);
 					else
-						parentScreen.setBackgroundColor(x, y, c);
+						parentPlane.setBackgroundColor(x, y, c);
 				}
 			}
 		}
@@ -255,16 +256,16 @@ public class ASCIIRenderer extends Drawable {
 	public void remove() {
 		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getTopRightX(); x++)
 			for (int y = borderBounds.getTopLeftY(); y < borderBounds.getBottomRightY(); y++)
-				parentScreen.drawChar(x, y, 0,' ');
+				parentPlane.drawChar(x, y, 0,' ');
 
 		if (textColorFile != null && textPalette != null)
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
 				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++)
-					parentScreen.setFontColor(x, y, 0, Color.WHITE);
+					parentPlane.setFontColor(x, y, 0, Color.WHITE);
 
 		if (backgroundColorFile != null && backgroundPalette != null)
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)
 				for (int x = textBounds.getTopLeftX(); x < textBounds.getBottomRightX(); x++)
-					parentScreen.setBackgroundColor(x, y, Color.BLACK);
+					parentPlane.setBackgroundColor(x, y, Color.BLACK);
 	}
 }

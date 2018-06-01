@@ -10,7 +10,7 @@ import java.awt.*;
 public class Bounds {
 	private Point tl, tr, bl, br;
 
-	Bounds(@NotNull Point tl, @NotNull Point tr, @NotNull Point bl, @NotNull Point br) {
+	public Bounds(@NotNull Point tl, @NotNull Point tr, @NotNull Point bl, @NotNull Point br) {
 		this.tl = tl;
 		this.tr = tr;
 		this.bl = bl;
