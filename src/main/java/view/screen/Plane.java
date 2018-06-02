@@ -15,13 +15,12 @@ public class Plane {
 	private ArrayList<ArrayList<Color>> backgroundLayer;
 	private ArrayList<ArrayList<ArrayList<Text>>> textLayers;
 
-	private Point centerInParent;
 	private Point realDimensions;
 	private Point topLeftInParent;
 	private Point topLeftInLocal;
 
 	public Plane(Screen parentScreen, Point dimensions, int initTextLayers) {
-		initPlane(parentScreen, dimensions, initTextLayers, new Point(Screen.COLUMNS, Screen.ROWS), new Point(0, 0), new Point(0, 9));
+		initPlane(parentScreen, dimensions, initTextLayers, new Point(Screen.COLUMNS, Screen.ROWS), new Point(0, 0), new Point(0, 0));
 	}
 
 	public Plane(Screen parentScreen, Point dimensions, int initTextLayers, Point realDimensions, Point topLeftInParent, Point topLeftInLocal) {
@@ -64,14 +63,6 @@ public class Plane {
 		return backgroundLayer.size();
 	}
 
-	public Color getRect(int x, int y) {
-		return backgroundLayer.get(y).get(x);
-	}
-
-	public Text getText(int x, int y, int layer) {
-		return textLayers.get(layer).get(y).get(x);
-	}
-
 	private Text buildDefaultText() {
 		Text t = new Text(" ");
 		t.setFont(View.font);
@@ -107,12 +98,18 @@ public class Plane {
 		}
 	}
 
+	private boolean inVisualBounds(int x, int y) {
+		return x < topLeftInParent.x + realDimensions.x && x > topLeftInParent.x && y < topLeftInParent.y + realDimensions.y && y > topLeftInParent.y;
+	}
+
 	public void drawChar(@NotNull Point p, int layer, char c) {
 		drawChar(p.x, p.y, layer, c);
 	}
 
 	public void drawChar(int x, int y, int layer, char c) {
 		textLayers.get(layer).get(y).get(x).setText(Character.toString(c));
+		if (inVisualBounds(x, y))
+			parentScreen.drawTextToLayer(x, y, layer, c);
 	}
 
 	public void flipChar(@NotNull Point p, int layer) {
@@ -120,11 +117,16 @@ public class Plane {
 	}
 
 	public void flipChar(int x, int y, int layer) {
-		textLayers.get(layer).get(y).get(x).setRotate(textLayers.get(layer).get(y).get(x).getRotate() == 180.0 ? 0.0 : 180.0);
+		Text t = textLayers.get(layer).get(y).get(x);
+		t.setRotate(t.getRotate() == 180.0 ? 0.0 : 180.0);
+		if (inVisualBounds(x, y))
+			parentScreen.setTextRotation(x, y, layer, (int) t.getRotate());
 	}
 
 	public void setFontColor(int x, int y, int layer, @NotNull Color c) {
 		textLayers.get(layer).get(y).get(x).setFill(c);
+		if (inVisualBounds(x, y))
+			parentScreen.setTextColor(x, y, layer, c);
 	}
 
 	public void setBackgroundColor(@NotNull Point p, @NotNull Color c) {
@@ -133,6 +135,8 @@ public class Plane {
 
 	public void setBackgroundColor(int x, int y, @NotNull Color c) {
 		backgroundLayer.get(y).set(x, c);
+		if (inVisualBounds(x, y))
+			parentScreen.drawToBackgroundLayer(x, y, c);
 	}
 
 	public void drawText(@NotNull Point p, int layer, @NotNull String text) {

@@ -49,8 +49,6 @@ public class View extends Application {
 		screen.initScreen(pane);
 
 		new Controller(this);
-
-		screen.drawPlane(plane, 0, 0);
 	}
 
 	public ASCIIRenderer buildASCIIRenderer(int x, int y, String gfxFileName) {

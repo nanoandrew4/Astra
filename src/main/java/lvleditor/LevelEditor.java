@@ -10,7 +10,7 @@ import java.awt.*;
 public class LevelEditor {
 
 	private Screen screen;
-	private Plane palettePlane;
+	private Plane toolPlane, editorPlane;
 	
 	private Bounds colorPicker, rColorSlider, gColorSlider, bColorSlider, gfxEditor;
 
@@ -18,7 +18,15 @@ public class LevelEditor {
 
 	public LevelEditor(Screen screen) {
 		this.screen = screen;
-		palettePlane = new Plane(Screen.COLUMNS, Screen.ROWS, 3);
+		toolPlane = new Plane(
+				screen, new Point(Screen.COLUMNS / 2, Screen.ROWS), 1,
+				new Point(Screen.COLUMNS / 2, Screen.ROWS), new Point(0, 0), new Point(0, 0)
+		);
+
+		editorPlane = new Plane(
+				screen, new Point(10, 10), 3, new Point(Screen.COLUMNS / 2, Screen.ROWS),
+				new Point(Screen.COLUMNS / 2, 0), new Point(0, 0)
+		);
 
 		drawColorTools();
 		drawEditor();
@@ -39,7 +47,7 @@ public class LevelEditor {
 		for (int z = 0; z < colorsPerColumn; z++)
 			for (int y = 0; y < colorsPerColumn; y++)
 				for (int x = 0; x <= colorsPerColumn; x++) {
-					palettePlane.setBackgroundColor(topLeftX + x + colorsPerColumn * (z % 4), topLeftY + y + (z / 4) * colorsPerColumn,
+					toolPlane.setBackgroundColor(topLeftX + x + colorsPerColumn * (z % 4), topLeftY + y + (z / 4) * colorsPerColumn,
 							Color.rgb(x * multiplier, y * multiplier, z * multiplier)
 					);
 				}
@@ -73,7 +81,7 @@ public class LevelEditor {
 			int r = (int) (selectedColor.getRed() * 255.0) + (rgb == 'r' ? y * 10 : 0);
 			int g = (int) (selectedColor.getGreen() * 255.0) + (rgb == 'g' ? y * 10 : 0);
 			int b = (int) (selectedColor.getBlue() * 255.0) + (rgb == 'b' ? y * 10 : 0);
-			palettePlane.setBackgroundColor(centerPos.x, centerPos.y + y, Color.rgb(r, g, b));
+			toolPlane.setBackgroundColor(centerPos.x, centerPos.y + y, Color.rgb(r, g, b));
 		}
 	}
 

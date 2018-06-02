@@ -91,9 +91,16 @@ public class Screen {
 		backgroundLayer[x][y].setFill(c);
 	}
 
-	public void drawToTextLayers(int x, int y, int layer, Text t) {
-		textLayers[x][y][layer].setText(t.getText());
-		textLayers[x][y][layer].setFill(t.getFill());
+	public void drawTextToLayer(int x, int y, int layer, char c) {
+		textLayers[x][y][layer].setText(Character.toString(c));
+	}
+
+	public void setTextColor(int x, int y, int layer, Color c) {
+		textLayers[x][y][layer].setFill(c);
+	}
+
+	public void setTextRotation(int x, int y, int layer, int rot) {
+		textLayers[x][y][layer].setRotate(rot);
 	}
 
 	private double computeTextWidth() {
