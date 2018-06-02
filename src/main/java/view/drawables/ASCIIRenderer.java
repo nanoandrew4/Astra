@@ -40,8 +40,8 @@ public class ASCIIRenderer extends Drawable {
 	 * @param y            Y coordinate at which to place the top left of the graphics
 	 * @param gfxFileName  Path to file in which the desired graphics are stored
 	 */
-	public ASCIIRenderer(@NotNull Plane parentPlane, int x, int y, @NotNull String gfxFileName) {
-		super(parentPlane);
+	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull Plane parentPlane, int x, int y, @NotNull String gfxFileName) {
+		super(parentScreen, parentPlane);
 
 		try {
 			gfxFile = Files.readAllLines(Paths.get(this.getClass().getResource(gfxFileName).toURI()));
@@ -60,8 +60,8 @@ public class ASCIIRenderer extends Drawable {
 	 * @param parentScreen Screen on which the ASCII graphics will be rendered
 	 * @param gfxFileName  Path to file in which the desired graphics are stored
 	 */
-	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull String gfxFileName) {
-		super(parentScreen);
+	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull Plane parentPlane, @NotNull String gfxFileName) {
+		super(parentScreen, parentPlane);
 
 		try {
 			gfxFile = Files.readAllLines(Paths.get(this.getClass().getResource(gfxFileName).toURI()));

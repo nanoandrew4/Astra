@@ -1,6 +1,5 @@
 package view.screen;
 
-import com.sun.istack.internal.NotNull;
 import javafx.animation.RotateTransition;
 import javafx.geometry.Point3D;
 import javafx.geometry.Rectangle2D;
@@ -14,7 +13,6 @@ import javafx.util.Duration;
 import view.View;
 import view.screen.animation.RotateAnimData;
 
-import java.awt.Point;
 import java.util.HashMap;
 
 public class Screen {
@@ -89,16 +87,13 @@ public class Screen {
 				}
 	}
 
-	public void drawPlane(Plane plane, int planeTX, int planeTY) {
-		for (int k = 0; k < plane.getNumOfLayers(); k++)
-			for (int j = 0; j < ROWS; j++)
-				for (int i = 0; i < COLUMNS; i++) {
-					if (k == 0 && i + planeTX < plane.getWidth() && j + planeTY < plane.getHeight())
-						backgroundLayer[i][j].setFill(plane.getRect(i + planeTX, j + planeTY));
-					Text t = plane.getText(i + planeTX, j + planeTY, k);
-					textLayers[i][j][k].setText(t.getText());
-					textLayers[i][j][k].setFill(t.getFill());
-				}
+	public void drawToBackgroundLayer(int x, int y, Color c) {
+		backgroundLayer[x][y].setFill(c);
+	}
+
+	public void drawToTextLayers(int x, int y, int layer, Text t) {
+		textLayers[x][y][layer].setText(t.getText());
+		textLayers[x][y][layer].setFill(t.getFill());
 	}
 
 	private double computeTextWidth() {

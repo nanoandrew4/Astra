@@ -29,9 +29,9 @@ public class Menu extends Drawable {
 	 * @param events List of events corresponding to what should happen if each entry in the menu is selected
 	 * @param columns Number of columns into which to divide the options
 	 */
-	public Menu(@NotNull Plane parentPlane, int sx, int sy, @NotNull List<String> options,
+	public Menu(@NotNull Screen parentScreen, @NotNull Plane parentPlane, int sx, int sy, @NotNull List<String> options,
 				@NotNull List<MenuEvent> events, int columns) {
-		super(parentPlane);
+		super(parentScreen, parentPlane);
 		this.options = options;
 		this.events = events;
 		this.columns = columns;

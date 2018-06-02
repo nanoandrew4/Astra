@@ -17,6 +17,7 @@ import view.screen.Plane;
 import view.screen.Screen;
 import view.screen.animation.FadeAnimData;
 
+import java.awt.*;
 import java.io.InputStream;
 import java.util.List;
 
@@ -35,8 +36,8 @@ public class View extends Application {
 
 	public void start(Stage primaryStage) {
 		pane = new Pane();
-		plane = new Plane(Screen.COLUMNS, Screen.ROWS, 3);
 		screen = new Screen();
+		plane = new Plane(screen, new Point(Screen.COLUMNS, Screen.ROWS), 3);
 		scene = new Scene(pane, Screen.screenPxWidth, Screen.screenPxHeight);
 
 		scene.setFill(Color.BLACK);
@@ -53,11 +54,11 @@ public class View extends Application {
 	}
 
 	public ASCIIRenderer buildASCIIRenderer(int x, int y, String gfxFileName) {
-		return new ASCIIRenderer(plane, x, y, gfxFileName);
+		return new ASCIIRenderer(screen, plane, x, y, gfxFileName);
 	}
 
 	public Menu buildMenu(int x, int y, List<String> options, List<MenuEvent> events, int columns) {
-		return new Menu(plane, x, y, options, events, columns);
+		return new Menu(screen, plane, x, y, options, events, columns);
 	}
 
 	public Pane getPane() {
@@ -66,10 +67,6 @@ public class View extends Application {
 
 	public Screen getScreen() {
 		return screen;
-	}
-
-	public Plane getPlane() {
-		return plane;
 	}
 
 	public Scene getScene() {

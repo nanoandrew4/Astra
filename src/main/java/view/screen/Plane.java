@@ -2,7 +2,6 @@ package view.screen;
 
 import com.sun.istack.internal.NotNull;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import view.View;
 
@@ -11,22 +10,40 @@ import java.util.ArrayList;
 
 public class Plane {
 
+	private Screen parentScreen;
+
 	private ArrayList<ArrayList<Color>> backgroundLayer;
 	private ArrayList<ArrayList<ArrayList<Text>>> textLayers;
 
-	private Point centerXY;
+	private Point centerInParent;
+	private Point realDimensions;
+	private Point topLeftInParent;
+	private Point topLeftInLocal;
 
-	public Plane(int initWidth, int initHeight, int initTextLayers) {
+	public Plane(Screen parentScreen, Point dimensions, int initTextLayers) {
+		initPlane(parentScreen, dimensions, initTextLayers, new Point(Screen.COLUMNS, Screen.ROWS), new Point(0, 0), new Point(0, 9));
+	}
+
+	public Plane(Screen parentScreen, Point dimensions, int initTextLayers, Point realDimensions, Point topLeftInParent, Point topLeftInLocal) {
+		initPlane(parentScreen, dimensions, initTextLayers, realDimensions, topLeftInParent, topLeftInLocal);
+	}
+
+	private void initPlane(Screen parentScreen, Point dimensions, int initTextLayers, Point realDimensions, Point topLeftInParent, Point topLeftInLocal) {
+		this.parentScreen = parentScreen;
+		this.realDimensions = realDimensions;
+		this.topLeftInParent = topLeftInParent;
+		this.topLeftInLocal = topLeftInLocal;
+
 		backgroundLayer = new ArrayList<>();
 		textLayers = new ArrayList<>();
 
 		for (int l = 0; l < initTextLayers; l++) {
 			textLayers.add(new ArrayList<>());
-			for (int j = 0; j < initHeight; j++) {
+			for (int j = 0; j < dimensions.y; j++) {
 				if (l == 0)
 					backgroundLayer.add(new ArrayList<>());
 				textLayers.get(l).add(new ArrayList<>());
-				for (int i = 0; i < initWidth; i++) {
+				for (int i = 0; i < dimensions.x; i++) {
 					if (l == 0)
 						backgroundLayer.get(j).add(Color.BLACK);
 					textLayers.get(l).get(j).add(buildDefaultText());
@@ -106,14 +123,6 @@ public class Plane {
 		textLayers.get(layer).get(y).get(x).setRotate(textLayers.get(layer).get(y).get(x).getRotate() == 180.0 ? 0.0 : 180.0);
 	}
 
-	public void drawText(@NotNull Point p, int layer, @NotNull String text) {
-		drawText(p.x, p.y, layer, text);
-	}
-
-	public void drawText(int x, int y, int layer, @NotNull String text) {
-		drawText(x, y, layer, backgroundLayer.get(0).size(), text);
-	}
-
 	public void setFontColor(int x, int y, int layer, @NotNull Color c) {
 		textLayers.get(layer).get(y).get(x).setFill(c);
 	}
@@ -124,6 +133,14 @@ public class Plane {
 
 	public void setBackgroundColor(int x, int y, @NotNull Color c) {
 		backgroundLayer.get(y).set(x, c);
+	}
+
+	public void drawText(@NotNull Point p, int layer, @NotNull String text) {
+		drawText(p.x, p.y, layer, text);
+	}
+
+	public void drawText(int x, int y, int layer, @NotNull String text) {
+		drawText(x, y, layer, backgroundLayer.get(0).size(), text);
 	}
 
 	public void drawText(int x, int y, int layer, int maxX, @NotNull String text) {
@@ -140,9 +157,9 @@ public class Plane {
 			}
 
 			for (int p = 0; p < str.length(); p++)
-				textLayers.get(layer).get(yOff).get(xOff++).setText(Character.toString(str.charAt(p)));
+				drawChar(xOff++, yOff, layer, str.charAt(p));
 			if (xOff < backgroundLayer.get(0).size())
-				textLayers.get(layer).get(yOff).get(xOff++).setText(" ");
+				drawChar(xOff++, yOff, layer, ' ');
 		}
 	}
 
@@ -152,7 +169,7 @@ public class Plane {
 
 	public void drawMarker(@NotNull Point prevMarkerPos, int layer, @NotNull Point newMarkerPos, char symbol) {
 		if (prevMarkerPos != null)
-			textLayers.get(layer).get(prevMarkerPos.y).get(prevMarkerPos.x).setText(" ");
-		textLayers.get(layer).get(newMarkerPos.y).get(newMarkerPos.x).setText(Character.toString(symbol));
+			drawChar(prevMarkerPos.x, prevMarkerPos.y, layer, ' ');
+		drawChar(newMarkerPos.x, newMarkerPos.y, layer, symbol);
 	}
 }

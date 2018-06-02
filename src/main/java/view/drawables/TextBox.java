@@ -22,8 +22,8 @@ public class TextBox extends Drawable {
 
 	private int lineDisplayed = 0, currLineDisplayed = 0, requestedWidth;
 
-	public TextBox(@NotNull Plane parentPlane, int x, int y, int requestedWidth, @NotNull List<String> text) {
-		super(parentPlane);
+	public TextBox(@NotNull Screen parentScreen, @NotNull Plane parentPlane, int x, int y, int requestedWidth, @NotNull List<String> text) {
+		super(parentScreen, parentPlane);
 		this.text = text;
 		this.requestedWidth = requestedWidth;
 
@@ -53,7 +53,7 @@ public class TextBox extends Drawable {
 
 		drawBorders();
 		drawNextLine();
-		parentPlane.flipChar(moreTextBelow,0);
+		parentPlane.flipChar(moreTextBelow, 0);
 
 		keyHandler = event -> {
 			if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.SPACE)
@@ -102,27 +102,27 @@ public class TextBox extends Drawable {
 					textBounds.getTopRightX(), text.get(y)
 			);
 		if (currLine.size() > maxLinesDisplayed && currLineDisplayed + maxLinesDisplayed < currLine.size())
-			parentPlane.drawChar(moreTextBelow, 0,'^');
+			parentPlane.drawChar(moreTextBelow, 0, '^');
 		else
-			parentPlane.drawChar(moreTextBelow, 0,' ');
+			parentPlane.drawChar(moreTextBelow, 0, ' ');
 		if (currLine.size() > maxLinesDisplayed && currLineDisplayed > 0)
-			parentPlane.drawChar(moreTextAbove, 0,'^');
+			parentPlane.drawChar(moreTextAbove, 0, '^');
 		else
-			parentPlane.drawChar(moreTextAbove, 0,' ');
+			parentPlane.drawChar(moreTextAbove, 0, ' ');
 	}
 
 	private void removeText() {
 		for (int x = textBounds.getTopLeftX(); x <= textBounds.getTopRightX(); x++)
 			for (int y = textBounds.getTopLeftY(); y <= textBounds.getBottomRightY(); y++)
-				parentPlane.drawChar(x, y, 0,' ');
+				parentPlane.drawChar(x, y, 0, ' ');
 	}
 
 	public void remove() {
 		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getTopRightX(); x++)
 			for (int y = borderBounds.getTopLeftY(); y < borderBounds.getBottomRightY(); y++)
-				parentPlane.drawChar(x, y, 0,' ');
+				parentPlane.drawChar(x, y, 0, ' ');
 
-		parentPlane.flipChar(moreTextBelow,0);
+		parentPlane.flipChar(moreTextBelow, 0);
 	}
 
 	public EventHandler<KeyEvent> getKeyHandler() {

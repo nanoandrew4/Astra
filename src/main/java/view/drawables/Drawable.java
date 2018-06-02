@@ -23,11 +23,8 @@ public abstract class Drawable {
 	protected final static int BORDER_PADDING = 2, MARKER_PADDING = 2, LINE_SPACING = 2;
 	protected boolean drawn, fitsOnScreen = true, borderless = false;
 
-	Drawable(Screen parentScreen) {
+	Drawable(Screen parentScreen, Plane parentPlane) {
 		this.parentScreen = parentScreen;
-	}
-
-	Drawable(Plane parentPlane) {
 		this.parentPlane = parentPlane;
 	}
 
