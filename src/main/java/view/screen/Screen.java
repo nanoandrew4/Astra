@@ -24,6 +24,9 @@ public class Screen {
 
 	public static HashMap<Axis, Point3D> axisMap = new HashMap<>();
 
+	/*
+	 * Map enums to Point3D objects used in rotations.
+	 */
 	static {
 		axisMap.put(Axis.X, new Point3D(1, 0, 0));
 		axisMap.put(Axis.Y, new Point3D(0, 1, 0));
@@ -39,18 +42,40 @@ public class Screen {
 		textLayers = new Text[COLUMNS][ROWS][3]; // 3 text layers
 	}
 
+	/**
+	 * Returns number of columns that the screen spans.
+	 *
+	 * @return Number of columns in the screen
+	 */
 	public int getScreenWidth() {
 		return COLUMNS;
 	}
 
+	/**
+	 * Returns number of rows that the screen spans.
+	 *
+	 * @return Number of rows in the screen
+	 */
 	public int getScreenHeight() {
 		return ROWS;
 	}
 
+	/**
+	 * Returns number of layers in the screen.
+	 *
+	 * @return Number of layers
+	 */
 	public int getNumOfLayers() {
 		return textLayers[0][0].length;
 	}
 
+	/**
+	 * Draw all text boxes and rectangles on to passed pane. This should only happen once, when the engine starts up.
+	 * Any graphical modifications should be done through the use of Plane objects, only one screen should exist during
+	 * the entire run of the program.
+	 *
+	 * @param pane Pane on which to draw the graphical objects
+	 */
 	public void initScreen(Pane pane) {
 		fontWidth = (int) Math.ceil(computeTextWidth());
 		fontHeight = (int) Math.ceil(View.font.getSize()) + 1;
@@ -87,22 +112,57 @@ public class Screen {
 				}
 	}
 
+	/**
+	 * Sets the color of the background layer at the given coordinates.
+	 *
+	 * @param x x-coordinate at which to change the background color
+	 * @param y y-coordinate at which to change the background color
+	 * @param c Desired background color
+	 */
 	public void drawToBackgroundLayer(int x, int y, Color c) {
 		backgroundLayer[x][y].setFill(c);
 	}
 
+	/**
+	 * Draws a character at the given coordinates and layer.
+	 *
+	 * @param x     x-coordinate at which to draw the character
+	 * @param y     y-coordinate at which to draw the character
+	 * @param layer Layer on which to draw the character
+	 * @param c     Character to draw
+	 */
 	public void drawTextToLayer(int x, int y, int layer, char c) {
 		textLayers[x][y][layer].setText(Character.toString(c));
 	}
 
+	/**
+	 * Sets the color of the character at the given coordinate and layer.
+	 *
+	 * @param x     x-coordinates of character to change color for
+	 * @param y     y-coordinate of character to change color for
+	 * @param layer Layer of character to change color for
+	 * @param c     Desired text color
+	 */
 	public void setTextColor(int x, int y, int layer, Color c) {
 		textLayers[x][y][layer].setFill(c);
 	}
 
+	/**
+	 * Sets the rotation of a Text object in the pane, to allow for rotations.
+	 *
+	 * @param x     x-coordinate of character to rotate
+	 * @param y     y-coordinate of character to rotate
+	 * @param layer Layer on which character to rotate is located on
+	 * @param rot   Angle (in degrees) to rotate character to
+	 */
 	public void setTextRotation(int x, int y, int layer, int rot) {
 		textLayers[x][y][layer].setRotate(rot);
 	}
 
+	/*
+	 * Computes the pixel width of all characters (since a monospace font is used).
+	 * Used to determine padding and columns for Screen.
+	 */
 	private double computeTextWidth() {
 		Text t = new Text("a");
 		t.setFont(View.font);
@@ -111,6 +171,14 @@ public class Screen {
 		return t.getLayoutBounds().getWidth();
 	}
 
+	/**
+	 * Animates the rotation of a character at a given position, layer, and with the desired parameters.
+	 *
+	 * @param x        x-coordinate of character to rotate
+	 * @param y        y-coordinate of character to rotate
+	 * @param layer    Layer at which character to rotate is located on
+	 * @param rotAnDat Object containing parameters for RotateTransition
+	 */
 	public void rotateAnimChar(int x, int y, int layer, RotateAnimData rotAnDat) {
 		RotateTransition rt = new RotateTransition(Duration.millis(rotAnDat.getDurationMillis()), textLayers[x][y][layer]);
 		rt.setFromAngle(rotAnDat.getStartAngle());
@@ -122,6 +190,16 @@ public class Screen {
 		rt.play();
 	}
 
+	/**
+	 * Animates the rotation of a group of characters, in a rectangular shape.
+	 *
+	 * @param startX    Leftmost x-coordinate of characters to rotate
+	 * @param endX      Rightmost x-coordinate of characters to rotate
+	 * @param startY    Topmost y-coordinate of characters to rotate
+	 * @param endY      Bottommost y-coordinate of characters to rotate
+	 * @param layer     Layer on which characters to rotate are located on
+	 * @param rotAnData Object containing parameters for RotateTransition
+	 */
 	public void rotateCharsAnim(int startX, int endX, int startY, int endY, int layer, RotateAnimData rotAnData) {
 		for (int x = startX; x < endX; x++)
 			for (int y = startY; y < endY; y++)

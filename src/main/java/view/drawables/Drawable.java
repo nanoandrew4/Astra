@@ -21,7 +21,7 @@ public abstract class Drawable {
 	 * Pixels of padding for optional use when determining the bounds of objects, or the spacing of them.
 	 */
 	protected final static int BORDER_PADDING = 2, MARKER_PADDING = 2, LINE_SPACING = 2;
-	protected boolean drawn, fitsOnScreen = true, borderless = false;
+	protected boolean drawn, borderless = false;
 
 	Drawable(Screen parentScreen, Plane parentPlane) {
 		this.parentScreen = parentScreen;
@@ -59,20 +59,5 @@ public abstract class Drawable {
 		for (int y = borderBounds.getTopLeftY(); y <= borderBounds.getBottomRightY(); y++)
 			for (int x = borderBounds.getTopLeftX(); x <= borderBounds.getTopRightX(); x += (borderBounds.getBottomRightX() - borderBounds.getTopLeftX()))
 				parentPlane.drawChar(x, y, 0, '|');
-	}
-
-	/**
-	 * Determines if the Drawable will fit on screen, and prints an error if not. The Drawable will also be prevented
-	 * from drawing in order to avoid errors, by setting the fitsOnScreen boolean to false.
-	 */
-	protected void fitsOnScreen() {
-		if (borderBounds == null)
-			return;
-
-		if (borderBounds.getTopLeftX() < 0 || borderBounds.getTopLeftY() < 0
-				|| borderBounds.getBottomRightX() >= Screen.COLUMNS || borderBounds.getBottomRightY() >= Screen.ROWS) {
-			fitsOnScreen = false;
-			System.err.println("Drawable with bounds: " + borderBounds.toString() + " is out of bounds");
-		}
 	}
 }

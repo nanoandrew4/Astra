@@ -35,7 +35,8 @@ public class ASCIIRenderer extends Drawable {
 	/**
 	 * Initializes the ASCIIRenderer and loads the desired graphics from the specified file.
 	 *
-//	 * @param parentScreen Screen on which the ASCII graphics will be rendered
+	 * @param parentScreen Screen on which the plane the graphics exist on will be drawn
+	 * @param parentPlane Plane on which to draw the graphics
 	 * @param x            X coordinate at which to place the top left of the graphics
 	 * @param y            Y coordinate at which to place the top left of the graphics
 	 * @param gfxFileName  Path to file in which the desired graphics are stored
@@ -58,6 +59,7 @@ public class ASCIIRenderer extends Drawable {
 	 * screen.
 	 *
 	 * @param parentScreen Screen on which the ASCII graphics will be rendered
+	 * @param parentPlane Plane on which to draw the graphics
 	 * @param gfxFileName  Path to file in which the desired graphics are stored
 	 */
 	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull Plane parentPlane, @NotNull String gfxFileName) {
@@ -78,6 +80,18 @@ public class ASCIIRenderer extends Drawable {
 		initRenderer((Screen.COLUMNS - maxX) / 2, (Screen.ROWS - gfxFile.size()) / 2);
 	}
 
+	/*
+	 * Given the name of the graphics file, searches for the corresponding color files, if they exist. This is done
+	 * by trimming the .gfx file extension, and adding the .tcol and .bcol extensions. Search is conducted in the same
+	 * dir as the .gfx file exists
+	 *
+	 * Defaults can be specified in the color files:
+	 * -Default text color - What color to use when blank spaces are encountered in the graphics file
+	 * -Default background color - What color to use when blank spaces are encountered on the background layer in the
+	 * 							   graphics file
+ 	 * -Palette - What palette file (relative path inside resources dir, no file extension) to use for determining
+ 	 * 			  colors in the color files
+	 */
 	private void findAndLoadColorFiles(@NotNull String gfxFileName) {
 		String[] removedFileExt = gfxFileName.split("\\.");
 		String fileName = removedFileExt[0];
@@ -122,8 +136,6 @@ public class ASCIIRenderer extends Drawable {
 				new Point(x, y + gfxFile.size()),
 				new Point(x + lengthLongestLine, y + gfxFile.size())
 		);
-
-		fitsOnScreen();
 	}
 
 	/**
@@ -221,9 +233,6 @@ public class ASCIIRenderer extends Drawable {
 						else
 							c = getColorFromPalette(s.charAt(x - textBounds.getTopLeftX()), textColor);
 					}
-
-//					if (!textColor)
-//						System.out.println(x + " " + y);
 
 					if (textColor)
 						parentPlane.setFontColor(x, y, 0, c);
