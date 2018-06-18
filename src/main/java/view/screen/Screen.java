@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Point3D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -21,9 +22,12 @@ import java.util.HashMap;
 
 public class Screen {
 	private Scene parentScene;
+	private Pane parentPane;
 
 	public static int screenPxWidth, screenPxHeight, fontWidth, fontHeight;
 	public final static int COLUMNS = 208, ROWS = 68;
+
+	public double paddingX, paddingY;
 
 	private Rectangle[][] backgroundLayer;
 	private Text[][][] textLayers;
@@ -81,21 +85,36 @@ public class Screen {
 		return textLayers[0][0].length;
 	}
 
+	public int getPixelXCoord(int x, int y) {
+		return (int) (backgroundLayer[x][y].getLayoutX() + paddingX);
+	}
+
+	public int getPixelYCoord(int x, int y) {
+		return (int) (backgroundLayer[x][y].getLayoutY() + paddingY);
+	}
+
+	public int getPixelWidth() {
+		return (int) backgroundLayer[0][0].getBoundsInLocal().getWidth();
+	}
+
+	public int getPixelHeight() {
+		return (int) backgroundLayer[0][0].getBoundsInLocal().getHeight();
+	}
+
 	/**
 	 * Draw all text boxes and rectangles on to passed pane. This should only happen once, when the engine starts up.
 	 * Any graphical modifications should be done through the use of Plane objects, only one screen should exist during
 	 * the entire run of the program.
 	 *
 	 * @param parentScene Scene on which this Screen is drawn
-	 * @param pane Pane on which to draw the graphical objects
+	 * @param pane        Pane on which to draw the graphical objects
 	 */
 	public void initScreen(Scene parentScene, Pane pane) {
 		this.parentScene = parentScene;
+		this.parentPane = pane;
 
 		fontWidth = (int) Math.ceil(computeTextWidth());
 		fontHeight = (int) Math.ceil(View.font.getSize()) + 1;
-
-		double paddingX = 0, paddingY = 0;
 
 		for (double d = 0; d < screenPxWidth; d += fontWidth)
 			if (d + fontWidth > screenPxWidth)
@@ -180,7 +199,7 @@ public class Screen {
 		textLayers[x][y][layer].setRotate(rot);
 	}
 
- 	/*
+	/*
 	 * Computes the pixel width of all characters (since a monospace font is used).
 	 * Used to determine padding and columns for Screen.
 	 */
@@ -234,5 +253,14 @@ public class Screen {
 
 	public void setMouseClickHandler(int x, int y, EventHandler<MouseEvent> event) {
 		textLayers[x][y][getNumOfLayers() - 1].setOnMouseClicked(event);
+	}
+
+	public void renderNode(Node n) {
+		parentPane.getChildren().add(n);
+	}
+
+	public void removeNode(Node n) {
+		if (parentPane.getChildren().contains(n))
+			parentPane.getChildren().remove(n);
 	}
 }

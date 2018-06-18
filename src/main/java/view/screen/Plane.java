@@ -4,6 +4,8 @@ import com.sun.istack.internal.NotNull;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import view.View;
 
@@ -15,6 +17,8 @@ public class Plane {
 
 	private ArrayList<ArrayList<Color>> backgroundLayer;
 	private ArrayList<ArrayList<ArrayList<Text>>> textLayers;
+
+	private ArrayList<Line[]> pixelBorders; // TODO: ALT USE HASHMAP IF NEED TO PRESERVE SPCIFIC BORDERS
 
 	private ArrayList<Point> mouseClickHandlers;
 
@@ -69,6 +73,7 @@ public class Plane {
 		backgroundLayer = new ArrayList<>();
 		textLayers = new ArrayList<>();
 
+		pixelBorders = new ArrayList<>();
 		this.mouseClickHandlers = new ArrayList<>();
 
 		for (int l = 0; l < initTextLayers; l++) {
@@ -342,5 +347,43 @@ public class Plane {
 	public void setMouseClickHandler(int x, int y, EventHandler<MouseEvent> event) {
 		mouseClickHandlers.add(new Point(x, y));
 		parentScreen.setMouseClickHandler(x, y, event);
+	}
+
+	public void drawPixelBorder(Point p) {
+		drawPixelBorder(p.x, p.y);
+	}
+
+	public void drawPixelBorder(int x, int y) {
+		int xCoord = parentScreen.getPixelXCoord(x, y);
+		int yCoord = parentScreen.getPixelYCoord(x, y);
+
+		Line[] borders = new Line[4];
+		borders[0] = new Line(xCoord, yCoord, xCoord + parentScreen.getPixelWidth(), yCoord);
+		borders[1] = new Line(xCoord + parentScreen.getPixelWidth(), yCoord, xCoord + parentScreen.getPixelWidth(), yCoord + parentScreen.getPixelHeight());
+		borders[2] = new Line(xCoord + parentScreen.getPixelWidth(), yCoord + parentScreen.getPixelHeight(), xCoord, yCoord + parentScreen.getPixelHeight());
+		borders[3] = new Line(xCoord, yCoord + parentScreen.getPixelHeight(), xCoord, yCoord);
+
+		Paint borderColor;
+		Color bckgColor = getBackgroundColor(x, y);
+
+		if ((bckgColor.getRed() + bckgColor.getGreen() + bckgColor.getBlue()) / 3d < 1.5)
+			borderColor = Color.WHITE;
+		else
+			borderColor = Color.BLACK;
+
+		for (Line l : borders) {
+			l.setStroke(borderColor);
+			l.setStrokeWidth(2);
+			parentScreen.renderNode(l);
+		}
+
+		pixelBorders.add(borders);
+	}
+
+	public void clearBorders() {
+		for (Line[] border : pixelBorders)
+			for (Line l : border)
+				parentScreen.removeNode(l);
+		pixelBorders.clear();
 	}
 }
