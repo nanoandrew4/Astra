@@ -1,6 +1,8 @@
 package view.screen;
 
 import com.sun.istack.internal.NotNull;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import view.View;
@@ -9,11 +11,12 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Plane {
-
 	private Screen parentScreen;
 
 	private ArrayList<ArrayList<Color>> backgroundLayer;
 	private ArrayList<ArrayList<ArrayList<Text>>> textLayers;
+
+	private ArrayList<Point> mouseClickHandlers;
 
 	private Point realDimensions;
 	private Point topLeftInParent;
@@ -66,6 +69,8 @@ public class Plane {
 		backgroundLayer = new ArrayList<>();
 		textLayers = new ArrayList<>();
 
+		this.mouseClickHandlers = new ArrayList<>();
+
 		for (int l = 0; l < initTextLayers; l++) {
 			textLayers.add(new ArrayList<>());
 			for (int j = 0; j < dimensions.y; j++) {
@@ -79,6 +84,24 @@ public class Plane {
 				}
 			}
 		}
+
+		parentScreen.registerPlane(this);
+	}
+
+	public void deletePlane() {
+		for (Point p : mouseClickHandlers)
+			parentScreen.setMouseClickHandler(p.x, p.y, null);
+		mouseClickHandlers.clear();
+
+		for (int k = 0; k < getNumOfLayers(); k++)
+			for (int y = topLeftInParent.y; y < topLeftInParent.y + realDimensions.y; y++)
+				for (int x = topLeftInParent.x; x < topLeftInParent.x + realDimensions.x; x++) {
+					if (k == 0)
+						parentScreen.drawToBackgroundLayer(x, y, Color.BLACK);
+					parentScreen.drawTextToLayer(x, y, k, ' ');
+					parentScreen.setTextColor(x, y, k, Color.WHITE);
+				}
+
 	}
 
 	/**
@@ -250,12 +273,16 @@ public class Plane {
 			parentScreen.drawToBackgroundLayer(x, y, c);
 	}
 
+	public Color getBackgroundColor(int x, int y) {
+		return backgroundLayer.get(y).get(x);
+	}
+
 	/**
 	 * Draw string of text to the plane.
 	 *
-	 * @param p Point at which to start drawing the string
+	 * @param p     Point at which to start drawing the string
 	 * @param layer Layer on which to draw the string
-	 * @param text String to draw
+	 * @param text  String to draw
 	 */
 	public void drawText(@NotNull Point p, int layer, @NotNull String text) {
 		drawText(p.x, p.y, layer, text);
@@ -264,10 +291,10 @@ public class Plane {
 	/**
 	 * Draw string of text to the plane.
 	 *
-	 * @param x x-coordinate at which to start drawing the string
-	 * @param y y-coordinate at which to start drawing the string
+	 * @param x     x-coordinate at which to start drawing the string
+	 * @param y     y-coordinate at which to start drawing the string
 	 * @param layer Layer on which to draw the string
-	 * @param text String to draw
+	 * @param text  String to draw
 	 */
 	public void drawText(int x, int y, int layer, @NotNull String text) {
 		drawText(x, y, layer, backgroundLayer.get(0).size(), text);
@@ -276,11 +303,11 @@ public class Plane {
 	/**
 	 * Draw a string of text to the plane.
 	 *
-	 * @param x x-coordinate at which to start drawing the string
-	 * @param y y-coordinate at which to start drawing the string
+	 * @param x     x-coordinate at which to start drawing the string
+	 * @param y     y-coordinate at which to start drawing the string
 	 * @param layer Layer on which to draw the string
-	 * @param maxX Maximum x-coordinate for string drawing, if it is reached, the text will wrap to the next line
-	 * @param text String to draw
+	 * @param maxX  Maximum x-coordinate for string drawing, if it is reached, the text will wrap to the next line
+	 * @param text  String to draw
 	 */
 	public void drawText(int x, int y, int layer, int maxX, @NotNull String text) {
 		String[] split = text.split(" ");
@@ -310,5 +337,10 @@ public class Plane {
 		if (prevMarkerPos != null)
 			drawChar(prevMarkerPos.x, prevMarkerPos.y, layer, ' ');
 		drawChar(newMarkerPos.x, newMarkerPos.y, layer, symbol);
+	}
+
+	public void setMouseClickHandler(int x, int y, EventHandler<MouseEvent> event) {
+		mouseClickHandlers.add(new Point(x, y));
+		parentScreen.setMouseClickHandler(x, y, event);
 	}
 }

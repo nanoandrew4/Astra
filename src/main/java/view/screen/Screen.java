@@ -1,10 +1,13 @@
 package view.screen;
 
 import javafx.animation.RotateTransition;
+import javafx.event.EventHandler;
 import javafx.geometry.Point3D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -13,9 +16,12 @@ import javafx.util.Duration;
 import view.View;
 import view.screen.animation.RotateAnimData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Screen {
+	private Scene parentScene;
+
 	public static int screenPxWidth, screenPxHeight, fontWidth, fontHeight;
 	public final static int COLUMNS = 208, ROWS = 68;
 
@@ -23,6 +29,8 @@ public class Screen {
 	private Text[][][] textLayers;
 
 	public static HashMap<Axis, Point3D> axisMap = new HashMap<>();
+
+	private ArrayList<Plane> planes = new ArrayList<>();
 
 	/*
 	 * Map enums to Point3D objects used in rotations.
@@ -40,6 +48,10 @@ public class Screen {
 
 		backgroundLayer = new Rectangle[COLUMNS][ROWS];
 		textLayers = new Text[COLUMNS][ROWS][3]; // 3 text layers
+	}
+
+	public void registerPlane(Plane p) {
+		this.planes.add(p);
 	}
 
 	/**
@@ -74,9 +86,12 @@ public class Screen {
 	 * Any graphical modifications should be done through the use of Plane objects, only one screen should exist during
 	 * the entire run of the program.
 	 *
+	 * @param parentScene Scene on which this Screen is drawn
 	 * @param pane Pane on which to draw the graphical objects
 	 */
-	public void initScreen(Pane pane) {
+	public void initScreen(Scene parentScene, Pane pane) {
+		this.parentScene = parentScene;
+
 		fontWidth = (int) Math.ceil(computeTextWidth());
 		fontHeight = (int) Math.ceil(View.font.getSize()) + 1;
 
@@ -110,6 +125,12 @@ public class Screen {
 					textLayers[i][j][k].setFont(View.font);
 					pane.getChildren().add(textLayers[i][j][k]);
 				}
+	}
+
+	public void clearScreen() {
+		for (Plane p : planes)
+			p.deletePlane();
+		planes.clear();
 	}
 
 	/**
@@ -159,7 +180,7 @@ public class Screen {
 		textLayers[x][y][layer].setRotate(rot);
 	}
 
-	/*
+ 	/*
 	 * Computes the pixel width of all characters (since a monospace font is used).
 	 * Used to determine padding and columns for Screen.
 	 */
@@ -205,5 +226,13 @@ public class Screen {
 			for (int y = startY; y < endY; y++)
 				if (!"".equals(textLayers[x][y][layer].getText()))
 					rotateAnimChar(x, y, layer, rotAnData);
+	}
+
+	public void setKeyHandlers(EventHandler<KeyEvent> event) {
+		parentScene.setOnKeyPressed(event);
+	}
+
+	public void setMouseClickHandler(int x, int y, EventHandler<MouseEvent> event) {
+		textLayers[x][y][getNumOfLayers() - 1].setOnMouseClicked(event);
 	}
 }

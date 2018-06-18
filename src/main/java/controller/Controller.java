@@ -57,7 +57,7 @@ public class Controller {
 				this::play,
 				this::displayOptions,
 				() -> {
-					view.resetScreen();
+					view.getScene().setOnKeyPressed(null);
 					new LevelEditor(view.getScreen());
 				},
 				Platform::exit
@@ -69,7 +69,7 @@ public class Controller {
 	}
 
 	private void play() {
-		view.resetScreen();
+		view.getScreen().clearScreen();
 		ASCIIRenderer testRoom = view.buildASCIIRenderer(0, 0, "/gfx/rooms/test.gfx");
 
 		testRoom.draw();

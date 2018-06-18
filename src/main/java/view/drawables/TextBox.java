@@ -41,16 +41,11 @@ public class TextBox extends Drawable {
 				new Point(textBounds.getBottomRightX() + BORDER_PADDING, textBounds.getBottomRightY() + BORDER_PADDING)
 		);
 
-		fitsOnScreen();
-
 		moreTextAbove = new Point(borderBounds.getTopRightX() - 1, borderBounds.getTopRightY() + 1);
 		moreTextBelow = new Point(borderBounds.getBottomRightX() - 1, borderBounds.getBottomRightY() - 1);
 	}
 
 	public void draw() {
-		if (!fitsOnScreen)
-			return;
-
 		drawBorders();
 		drawNextLine();
 		parentPlane.flipChar(moreTextBelow, 0);

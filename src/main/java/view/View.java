@@ -46,7 +46,7 @@ public class View extends Application {
 		primaryStage.show();
 
 		font = loadGameFont("/fonts/SpaceMono-Regular.ttf");
-		screen.initScreen(pane);
+		screen.initScreen(scene, pane);
 
 		new Controller(this);
 	}
@@ -78,17 +78,6 @@ public class View extends Application {
 		ft.setInterpolator(fadeAnimData.getInterpolator());
 		ft.setOnFinished(fadeAnimData.getOnFinished());
 		ft.play();
-	}
-
-	public void resetScreen() {
-		for (int z = 0; z < screen.getNumOfLayers(); z++)
-			for (int x = 0; x < Screen.COLUMNS; x++)
-				for (int y = 0; y < Screen.ROWS; y++) {
-					plane.drawChar(x, y, z, ' ');
-					plane.setFontColor(x, y, z, Color.WHITE);
-					if (z == 0)
-						plane.setBackgroundColor(x, y, Color.BLACK);
-				}
 	}
 
 	private Font loadGameFont(String urlToRes) {

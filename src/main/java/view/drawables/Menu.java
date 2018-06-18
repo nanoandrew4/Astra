@@ -70,13 +70,9 @@ public class Menu extends Drawable {
 				new Point(textBounds.getBottomRightX() + BORDER_PADDING, textBounds.getBottomRightY() + BORDER_PADDING)
 		);
 
-		fitsOnScreen();
 	}
 
 	public void draw() {
-		if (!fitsOnScreen)
-			return;
-
 		drawBorders();
 		parentPlane.drawMarker(null, 0,optionMarkerCoords[0], '>');
 
