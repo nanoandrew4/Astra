@@ -35,7 +35,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>Main</mainClass>
+                                    <mainClass>view.View</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
@@ -44,4 +44,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
+    </dependencies>
 </project>

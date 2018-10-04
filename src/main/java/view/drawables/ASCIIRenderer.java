@@ -1,12 +1,13 @@
 package view.drawables;
 
-import com.sun.istack.internal.NotNull;
+import ioutils.InputStreamReader;
 import javafx.scene.paint.Color;
 import view.colors.Palette;
 import view.screen.Plane;
 import view.screen.Screen;
 import view.screen.animation.RotateAnimData;
 
+import javax.validation.constraints.NotNull;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -36,19 +37,16 @@ public class ASCIIRenderer extends Drawable {
 	 * Initializes the ASCIIRenderer and loads the desired graphics from the specified file.
 	 *
 	 * @param parentScreen Screen on which the plane the graphics exist on will be drawn
-	 * @param parentPlane Plane on which to draw the graphics
+	 * @param parentPlane  Plane on which to draw the graphics
 	 * @param x            X coordinate at which to place the top left of the graphics
 	 * @param y            Y coordinate at which to place the top left of the graphics
 	 * @param gfxFileName  Path to file in which the desired graphics are stored
 	 */
-	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull Plane parentPlane, int x, int y, @NotNull String gfxFileName) {
+	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull Plane parentPlane, int x, int y, @NotNull String
+			gfxFileName) {
 		super(parentScreen, parentPlane);
 
-		try {
-			gfxFile = Files.readAllLines(Paths.get(this.getClass().getResource(gfxFileName).toURI()));
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
+		gfxFile = InputStreamReader.readAsStringList(this.getClass().getResourceAsStream(gfxFileName));
 
 		findAndLoadColorFiles(gfxFileName);
 		initRenderer(x, y);
@@ -59,17 +57,13 @@ public class ASCIIRenderer extends Drawable {
 	 * screen.
 	 *
 	 * @param parentScreen Screen on which the ASCII graphics will be rendered
-	 * @param parentPlane Plane on which to draw the graphics
+	 * @param parentPlane  Plane on which to draw the graphics
 	 * @param gfxFileName  Path to file in which the desired graphics are stored
 	 */
 	public ASCIIRenderer(@NotNull Screen parentScreen, @NotNull Plane parentPlane, @NotNull String gfxFileName) {
 		super(parentScreen, parentPlane);
 
-		try {
-			gfxFile = Files.readAllLines(Paths.get(this.getClass().getResource(gfxFileName).toURI()));
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
+		gfxFile = InputStreamReader.readAsStringList(this.getClass().getResourceAsStream(gfxFileName));
 
 		int maxX = 0;
 		for (String aGfxFile : gfxFile)
@@ -89,8 +83,8 @@ public class ASCIIRenderer extends Drawable {
 	 * -Default text color - What color to use when blank spaces are encountered in the graphics file
 	 * -Default background color - What color to use when blank spaces are encountered on the background layer in the
 	 * 							   graphics file
- 	 * -Palette - What palette file (relative path inside resources dir, no file extension) to use for determining
- 	 * 			  colors in the color files
+	 * -Palette - What palette file (relative path inside resources dir, no file extension) to use for determining
+	 * 			  colors in the color files
 	 */
 	private void findAndLoadColorFiles(@NotNull String gfxFileName) {
 		String[] removedFileExt = gfxFileName.split("\\.");
@@ -105,9 +99,11 @@ public class ASCIIRenderer extends Drawable {
 			else if (split.length > 3 && "using".equals(split[0]) && "default".equals(split[1])) {
 				String[] rgbDefault = split[3].split(",");
 				if ("textcolor".equals(split[2]))
-					defaultText = Color.rgb(Integer.valueOf(rgbDefault[0]), Integer.valueOf(rgbDefault[1]), Integer.valueOf(rgbDefault[2]));
+					defaultText = Color.rgb(Integer.valueOf(rgbDefault[0]), Integer.valueOf(rgbDefault[1]), Integer
+							.valueOf(rgbDefault[2]));
 				else if ("backgroundcolor".equals(split[2]))
-					defaultBack = Color.rgb(Integer.valueOf(rgbDefault[0]), Integer.valueOf(rgbDefault[1]), Integer.valueOf(rgbDefault[2]));
+					defaultBack = Color.rgb(Integer.valueOf(rgbDefault[0]), Integer.valueOf(rgbDefault[1]), Integer
+							.valueOf(rgbDefault[2]));
 			} else if (!"".equals(aGfxFile.trim()))
 				break;
 			toBeRemoved.add(aGfxFile);
@@ -116,11 +112,11 @@ public class ASCIIRenderer extends Drawable {
 		for (String s : toBeRemoved)
 			gfxFile.remove(s);
 
-		URL tURL = this.getClass().getResource(fileName + ".tcol");
-		URL bURL = this.getClass().getResource(fileName + ".bcol");
-		if (tURL != null && paletteFileName != null)
+		URL tUrl = this.getClass().getResource(fileName + ".tcol");
+		URL bUrl = this.getClass().getResource(fileName + ".bcol");
+		if (tUrl != null && paletteFileName != null)
 			setTextColor(fileName + ".tcol", paletteFileName);
-		if (bURL != null && paletteFileName != null)
+		if (bUrl != null && paletteFileName != null)
 			setBackgroundColor(fileName + ".bcol", paletteFileName);
 	}
 
@@ -147,12 +143,8 @@ public class ASCIIRenderer extends Drawable {
 	 * @param textPaletteFileName Path to file in which the palette to be used is
 	 */
 	public void setTextColor(@NotNull String textColorFileName, @NotNull String textPaletteFileName) {
-		try {
-			textColorFile = Files.readAllLines(Paths.get(this.getClass().getResource(textColorFileName).toURI()));
-			textPalette = new Palette(textPaletteFileName);
-		} catch (URISyntaxException | IOException e) {
-			e.printStackTrace();
-		}
+		textColorFile = InputStreamReader.readAsStringList(this.getClass().getResourceAsStream(textColorFileName));
+		textPalette = new Palette(textPaletteFileName);
 	}
 
 	/**
@@ -175,13 +167,12 @@ public class ASCIIRenderer extends Drawable {
 	 * @param backgroundColorFileName   Path to file in which the colors for the graphics are stored
 	 * @param backgroundPaletteFileName Path to file in which the palette to be used is
 	 */
-	public void setBackgroundColor(@NotNull String backgroundColorFileName, @NotNull String backgroundPaletteFileName) {
-		try {
-			backgroundColorFile = Files.readAllLines(Paths.get(this.getClass().getResource(backgroundColorFileName).toURI()));
-			backgroundPalette = new Palette(backgroundPaletteFileName);
-		} catch (URISyntaxException | IOException e) {
-			e.printStackTrace();
-		}
+	public void setBackgroundColor(@NotNull String backgroundColorFileName, @NotNull String
+			backgroundPaletteFileName) {
+		backgroundColorFile = InputStreamReader.readAsStringList(
+				this.getClass().getResourceAsStream(backgroundColorFileName)
+		);
+		backgroundPalette = new Palette(backgroundPaletteFileName);
 	}
 
 	/**
@@ -265,7 +256,7 @@ public class ASCIIRenderer extends Drawable {
 	public void remove() {
 		for (int x = borderBounds.getTopLeftX(); x < borderBounds.getTopRightX(); x++)
 			for (int y = borderBounds.getTopLeftY(); y < borderBounds.getBottomRightY(); y++)
-				parentPlane.drawChar(x, y, 0,' ');
+				parentPlane.drawChar(x, y, 0, ' ');
 
 		if (textColorFile != null && textPalette != null)
 			for (int y = textBounds.getTopLeftY(); y < textBounds.getBottomRightY(); y++)

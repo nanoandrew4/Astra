@@ -17,6 +17,7 @@ import javafx.util.Duration;
 import view.View;
 import view.screen.animation.RotateAnimData;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -161,6 +162,16 @@ public class Screen {
 	 */
 	public void drawToBackgroundLayer(int x, int y, Color c) {
 		backgroundLayer[x][y].setFill(c);
+	}
+
+	/**
+	 * Sets the color of the background layer at the given coordinates.
+	 *
+	 * @param p Point at which to change the background color
+	 * @param c Desired background color
+	 */
+	public void drawToBackgroundLayer(Point p, Color c) {
+		backgroundLayer[p.x][p.y].setFill(c);
 	}
 
 	/**

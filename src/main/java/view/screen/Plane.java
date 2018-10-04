@@ -1,6 +1,5 @@
 package view.screen;
 
-import com.sun.istack.internal.NotNull;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -9,6 +8,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import view.View;
 
+import javax.validation.constraints.NotNull;
 import java.awt.*;
 import java.util.ArrayList;
 

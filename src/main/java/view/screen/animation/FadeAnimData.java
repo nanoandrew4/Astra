@@ -1,9 +1,10 @@
 package view.screen.animation;
 
-import com.sun.istack.internal.NotNull;
 import javafx.animation.Interpolator;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Builder for all used attributes that can be set in FadeTransition. Passed when requesting an animation to the Screen.

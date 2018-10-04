@@ -1,11 +1,11 @@
 package view.drawables;
 
-import com.sun.istack.internal.NotNull;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import view.screen.Plane;
 import view.screen.Screen;
 
+import javax.validation.constraints.NotNull;
 import java.awt.*;
 import java.util.List;
 

@@ -1,8 +1,7 @@
 package view.drawables;
 
-import com.sun.istack.internal.NotNull;
-
-import java.awt.*;
+import javax.validation.constraints.NotNull;
+import java.awt.Point;
 
 /**
  * Determine the four points by which any Drawable is bounded.
