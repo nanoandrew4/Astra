@@ -1,10 +1,8 @@
 package lvleditor;
 
 import javafx.event.EventHandler;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
-import view.drawables.Bounds;
 import view.screen.Plane;
 import view.screen.Screen;
 
@@ -15,28 +13,20 @@ import java.util.HashMap;
 public class LevelEditor {
 
 	private Screen parentScreen;
-	private Plane toolPlane, editorPlane;
+	private Plane toolPlane;
+
+	private Editor editor;
 	protected ColorPicker colorPicker;
 	protected ColorSliders colorSliders;
+
 	private ArrayList<EventHandler<KeyEvent>> keyHandlers;
 	private int activeHandler = 0;
 
-	private Bounds gfxEditor;
 
 	protected final static int COLORS_PER_COLUMN = 8;
-	private char activeColorSlider = 'r';
 	private HashMap<Character, Point> pickerCentreCoords;
 
 	private Point offset = new Point(0, 0);
-
-	protected char getActiveColorSlider() {
-		return activeColorSlider;
-	}
-
-	protected void setActiveColorSlider(char color) {
-		if (color == 'r' || color == 'g' || color == 'b')
-			activeColorSlider = color;
-	}
 
 	protected ArrayList<EventHandler<KeyEvent>> getKeyHandlers() {
 		return keyHandlers;
@@ -63,7 +53,7 @@ public class LevelEditor {
 	}
 
 	protected Point getActivePickerCoordinates() {
-		return pickerCentreCoords.get(activeColorSlider);
+		return pickerCentreCoords.get(colorSliders.getActiveSlider());
 	}
 
 	public LevelEditor(Screen parentScreen) {
@@ -78,52 +68,30 @@ public class LevelEditor {
 				new Point(Screen.COLUMNS / 2, Screen.ROWS), new Point(0, 0), new Point(0, 0)
 		);
 
-		editorPlane = new Plane(
-				parentScreen, new Point(10, 10), 3, new Point(Screen.COLUMNS / 2, Screen.ROWS),
-				new Point(Screen.COLUMNS / 2, 0), new Point(0, 0)
-		);
+		parentScreen.setBackgroundColor(0,0, Color.WHITE);
+		parentScreen.setBackgroundColor(Screen.COLUMNS - 1, 0, Color.WHITE);
+		parentScreen.setBackgroundColor(0, Screen.ROWS - 1, Color.WHITE);
+		parentScreen.setBackgroundColor(Screen.COLUMNS - 1, Screen.ROWS - 1, Color.WHITE);
+		parentScreen.setBackgroundColor(Screen.COLUMNS - 2, Screen.ROWS - 1, Color.WHITE);
 
-		drawColorTools();
-		drawEditor();
+		initLevelEditor();
 	}
 
-	public void setSelectedColor(Color c) {
+	protected void setSelectedColor(Color c) {
 		colorPicker.selectedColor = c;
-		parentScreen.drawToBackgroundLayer(colorPicker.getSelectedColorPos(), c);
+		parentScreen.setBackgroundColor(colorPicker.getSelectedColorPos(), c);
 	}
 
-	private void drawColorTools() {
+	private void initLevelEditor() {
 		int topLeftX = Screen.COLUMNS / 16 - 4;
 		int topLeftY = (int) (Screen.ROWS / 1.5) - 4;
 
 		colorPicker = new ColorPicker(topLeftX, topLeftY, this);
 		colorSliders = new ColorSliders(this);
+		editor = new Editor(this);
 
 		parentScreen.setKeyHandlers(keyHandlers.get(0));
 
-		toolPlane.drawPixelBorder(pickerCentreCoords.get(activeColorSlider));
-	}
-
-	private void drawEditor() {
-		gfxEditor = new Bounds(
-				new Point(Screen.COLUMNS / 2, 0), new Point(Screen.COLUMNS, 0),
-				new Point(Screen.COLUMNS / 2, Screen.ROWS), new Point(Screen.COLUMNS, Screen.ROWS)
-		);
-
-		keyHandlers.add((event) -> {
-			switch (event.getCode()) {
-				case TAB:
-					parentScreen.setKeyHandlers(keyHandlers.get(++activeHandler % keyHandlers.size()));
-					break;
-				case UP:
-					break;
-				case DOWN:
-					break;
-				case LEFT:
-					break;
-				case RIGHT:
-					break;
-			}
-		});
+		toolPlane.drawPixelBorder(pickerCentreCoords.get(colorSliders.getActiveSlider()));
 	}
 }

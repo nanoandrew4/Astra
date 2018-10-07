@@ -22,8 +22,8 @@ public class Controller {
 		this.view = view;
 		model = new Model();
 
-		displayLogo();
-//		displayMainMenu();
+//		displayLogo();
+		displayMainMenu();
 	}
 
 	private void displayLogo() {

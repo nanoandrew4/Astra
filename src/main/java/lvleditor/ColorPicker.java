@@ -20,16 +20,19 @@ public class ColorPicker {
 
 		int multiplier = 255 / LevelEditor.COLORS_PER_COLUMN;
 
-		levelEditor.getPickerCentreCoords().put('r', new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 4 + 5, topLeftY + LevelEditor
-				.COLORS_PER_COLUMN));
-		levelEditor.getPickerCentreCoords().put('g', new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 4 + 8, topLeftY + LevelEditor
-				.COLORS_PER_COLUMN));
-		levelEditor.getPickerCentreCoords().put('b', new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 4 + 11, topLeftY + LevelEditor
-				.COLORS_PER_COLUMN));
+		levelEditor.getPickerCentreCoords().put('r', new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 4 + 5,
+															   topLeftY + LevelEditor.COLORS_PER_COLUMN));
+		levelEditor.getPickerCentreCoords().put('g', new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 4 + 8,
+															   topLeftY + LevelEditor.COLORS_PER_COLUMN));
+		levelEditor.getPickerCentreCoords().put('b', new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 4 + 11,
+															   topLeftY + LevelEditor.COLORS_PER_COLUMN));
 
 		colorPickerBounds = new Bounds(
-				new Point(topLeftX, topLeftY), new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 2, topLeftY),
-				new Point(topLeftX, topLeftY + LevelEditor.COLORS_PER_COLUMN * 2), new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 2, topLeftY + LevelEditor.COLORS_PER_COLUMN * 2)
+				new Point(topLeftX, topLeftY),
+				new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 2, topLeftY),
+				new Point(topLeftX, topLeftY + LevelEditor.COLORS_PER_COLUMN * 2),
+				new Point(topLeftX + LevelEditor.COLORS_PER_COLUMN * 2,
+						  topLeftY + LevelEditor.COLORS_PER_COLUMN * 2)
 		);
 
 		for (int z = 0; z < LevelEditor.COLORS_PER_COLUMN; z++)

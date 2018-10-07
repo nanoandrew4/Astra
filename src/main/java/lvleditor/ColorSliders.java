@@ -11,6 +11,9 @@ public class ColorSliders {
 
 	private Bounds rColorSliderBounds, gColorSliderBounds, bColorSliderBounds;
 
+	private char[] charColorSliders = {'r', 'g', 'b'};
+	private int activeSlider = 0;
+
 	public ColorSliders(LevelEditor levelEditor) {
 		this.levelEditor = levelEditor;
 
@@ -49,31 +52,23 @@ public class ColorSliders {
 			KeyCode keyCode = event.getCode();
 			if (keyCode == KeyCode.TAB)
 				levelEditor.nextKeyHandler();
+
 			else if (keyCode == KeyCode.UP || keyCode == KeyCode.DOWN) {
-				Point pickerPos = levelEditor.getActivePickerCoordinates();
-				if (canPaletteSliderMove(keyCode))
-					levelEditor.colorPicker.selectedColor = levelEditor.getToolPlane().getBackgroundColor(pickerPos.x,
-																	   pickerPos.y + (keyCode == KeyCode.UP ? -1 : 1)
-							);
-				drawSlidingPalettes();
+				if (canPaletteSliderMove(keyCode)) {
+					Point pickerPos = levelEditor.getActivePickerCoordinates();
+					int delta = keyCode == KeyCode.UP ? -1 : 1;
+					levelEditor.colorPicker.selectedColor =
+							levelEditor.getToolPlane().getBackgroundColor(pickerPos.x, pickerPos.y + delta);
+					drawSlidingPalettes();
+				}
 			} else if (keyCode == KeyCode.RIGHT) {
-				if (levelEditor.getActiveColorSlider() == 'r')
-					levelEditor.setActiveColorSlider('g');
-				else if (levelEditor.getActiveColorSlider() == 'g')
-					levelEditor.setActiveColorSlider('b');
-				else if (levelEditor.getActiveColorSlider() == 'b')
-					levelEditor.setActiveColorSlider('r');
+				activeSlider = (++activeSlider % charColorSliders.length);
 
 				levelEditor.getToolPlane().clearBorders();
 				Point pickerPos = levelEditor.getActivePickerCoordinates();
 				levelEditor.getToolPlane().drawPixelBorder(pickerPos.x, pickerPos.y);
 			} else if (keyCode == KeyCode.LEFT) {
-				if (levelEditor.getActiveColorSlider() == 'r')
-					levelEditor.setActiveColorSlider('b');
-				else if (levelEditor.getActiveColorSlider() == 'g')
-					levelEditor.setActiveColorSlider('r');
-				else if (levelEditor.getActiveColorSlider() == 'b')
-					levelEditor.setActiveColorSlider('g');
+				activeSlider = ((--activeSlider + charColorSliders.length) % charColorSliders.length);
 
 				levelEditor.getToolPlane().clearBorders();
 				Point pickerPos = levelEditor.getActivePickerCoordinates();
@@ -83,32 +78,32 @@ public class ColorSliders {
 	}
 
 	private boolean canPaletteSliderMove(KeyCode keyCode) {
-		return (levelEditor.getActiveColorSlider() == 'r' && // TODO: CLEAN UP WTF
+		return (activeSlider == 0 &&
 				((levelEditor.colorPicker.selectedColor.getRed() != 1f && keyCode != KeyCode.UP) ||
 				 (levelEditor.colorPicker.selectedColor.getRed() != 0 && keyCode != KeyCode.DOWN))
 			   ) ||
-			   (levelEditor.getActiveColorSlider() == 'g' &&
+			   (activeSlider == 1 &&
 				((levelEditor.colorPicker.selectedColor.getGreen() != 1f && keyCode != KeyCode.UP) ||
 				 (levelEditor.colorPicker.selectedColor.getGreen() != 0 && keyCode != KeyCode.DOWN))
 			   ) ||
-			   (levelEditor.getActiveColorSlider() == 'b' &&
+			   (activeSlider == 2 &&
 				((levelEditor.colorPicker.selectedColor.getBlue() != 1f && keyCode != KeyCode.UP) ||
 				 (levelEditor.colorPicker.selectedColor.getBlue() != 0 && keyCode != KeyCode.DOWN))
 			   );
 	}
 
-	public void drawSlidingPalettes() {
+	protected void drawSlidingPalettes() {
 		drawSlidingPalette(levelEditor.getPickerCentreCoords().get('r'), LevelEditor.COLORS_PER_COLUMN * 2, 'r');
 		drawSlidingPalette(levelEditor.getPickerCentreCoords().get('g'), LevelEditor.COLORS_PER_COLUMN * 2, 'g');
 		drawSlidingPalette(levelEditor.getPickerCentreCoords().get('b'), LevelEditor.COLORS_PER_COLUMN * 2, 'b');
 	}
 
-	private void drawSlidingPalette(Point centerPos, int length, char rgb) {
+	private void drawSlidingPalette(Point centerPos, int length, char channel) {
 		boolean maxed = false;
 		for (int y = 0; y < length; y++) {
-			int r = getChannelColorValue((int) (levelEditor.getSelectedColor().getRed() * 255.0), y, rgb == 'r');
-			int g = getChannelColorValue((int) (levelEditor.getSelectedColor().getGreen() * 255.0), y, rgb == 'g');
-			int b = getChannelColorValue((int) (levelEditor.getSelectedColor().getBlue() * 255.0), y, rgb == 'b');
+			int r = getChannelColorValue((int) (levelEditor.getSelectedColor().getRed() * 255.0), y, channel == 'r');
+			int g = getChannelColorValue((int) (levelEditor.getSelectedColor().getGreen() * 255.0), y, channel == 'g');
+			int b = getChannelColorValue((int) (levelEditor.getSelectedColor().getBlue() * 255.0), y, channel == 'b');
 			if (r <= 0 || r >= 255 || g <= 0 || g >= 255 || b <= 0 || b >= 255) {
 				if (!maxed && r >= 255 && levelEditor.getSelectedColor().getRed() < 1.0) {
 					r = 255;
@@ -137,19 +132,38 @@ public class ColorSliders {
 				} else if (b > 255 || b < 0)
 					b = r = g = 0;
 			}
-			levelEditor.getToolPlane().setBackgroundColor(centerPos.x, centerPos.y + ((y / 2) * (y % 2 == 0 ? 1 : -1)), Color.rgb(r, g, b));
+			levelEditor.getToolPlane().setBackgroundColor(centerPos.x,
+														  centerPos.y + ((y / 2) * (y % 2 == 0 ? 1 : -1)),
+														  Color.rgb(r, g, b)
+			);
 		}
 
-		levelEditor.getToolPlane().drawChar(centerPos.x, centerPos.y - length / 2 - 1, 0, rgb);
-		if (rgb == 'r')
+		levelEditor.getToolPlane().drawChar(centerPos.x, centerPos.y - length / 2 - 1, 0, channel);
+		if (channel == 'r')
 			levelEditor.getToolPlane().setFontColor(centerPos.x, centerPos.y - length / 2 - 1, 0, Color.RED);
-		else if (rgb == 'g')
+		else if (channel == 'g')
 			levelEditor.getToolPlane().setFontColor(centerPos.x, centerPos.y - length / 2 - 1, 0, Color.GREEN);
-		else
+		else if (channel == 'b')
 			levelEditor.getToolPlane().setFontColor(centerPos.x, centerPos.y - length / 2 - 1, 0, Color.BLUE);
 	}
 
 	private int getChannelColorValue(int baseValue, int y, boolean gradient) {
 		return baseValue + (gradient ? ((y / 2) * (y % 2 == 0 ? 1 : -1)) * LevelEditor.COLORS_PER_COLUMN : 0);
+	}
+
+	public Bounds getRedColorSliderBounds() {
+		return rColorSliderBounds;
+	}
+
+	public Bounds getGreenColorSliderBounds() {
+		return gColorSliderBounds;
+	}
+
+	public Bounds getBlueColorSliderBounds() {
+		return bColorSliderBounds;
+	}
+
+	public char getActiveSlider() {
+		return charColorSliders[activeSlider];
 	}
 }

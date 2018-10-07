@@ -25,7 +25,7 @@ public class Screen {
 	private Scene parentScene;
 	private Pane parentPane;
 
-	public static int screenPxWidth, screenPxHeight, fontWidth, fontHeight;
+	public static double screenPxWidth, screenPxHeight, fontWidth, fontHeight;
 	public final static int COLUMNS = 208, ROWS = 68;
 
 	public double paddingX, paddingY;
@@ -86,12 +86,26 @@ public class Screen {
 		return textLayers[0][0].length;
 	}
 
-	public int getPixelXCoord(int x, int y) {
-		return (int) (backgroundLayer[x][y].getLayoutX() + paddingX);
+	/**
+	 * Get x-coordinate that the pixel was drawn at on the JavaFX screen.
+	 *
+	 * @param x X coordinate on engine screen to get global position for
+	 * @param y Y coordinate on engine screen to get global position for
+	 * @return X coordinate of the given pixel on the JavaFX screen
+	 */
+	public int getGlobalPixelXCoord(int x, int y) {
+		return (int) backgroundLayer[x][y].getLayoutX();
 	}
 
-	public int getPixelYCoord(int x, int y) {
-		return (int) (backgroundLayer[x][y].getLayoutY() + paddingY);
+	/**
+	 * Get y-coordinate that the pixel was drawn at on the JavaFX screen.
+	 *
+	 * @param x X coordinate on engine screen to get global position for
+	 * @param y Y coordinate on engine screen to get global position for
+	 * @return Y coordinate of the given pixel on the JavaFX screen
+	 */
+	public int getGlobalPixelYCoord(int x, int y) {
+		return (int) backgroundLayer[x][y].getLayoutY();
 	}
 
 	public int getPixelWidth() {
@@ -114,24 +128,24 @@ public class Screen {
 		this.parentScene = parentScene;
 		this.parentPane = pane;
 
-		fontWidth = (int) Math.ceil(computeTextWidth());
-		fontHeight = (int) Math.ceil(View.font.getSize()) + 1;
+		fontWidth = computeTextWidth();
+		fontHeight = View.font.getSize();
 
 		for (double d = 0; d < screenPxWidth; d += fontWidth)
 			if (d + fontWidth > screenPxWidth)
-				paddingX = (screenPxWidth - d) / 2;
+				paddingX = Math.floor((screenPxWidth - d) / 2);
 
 		for (double d = 0; d < screenPxHeight; d += fontHeight)
 			if (d + fontHeight > screenPxHeight)
-				paddingY = (screenPxHeight - d) / 4;
+				paddingY = Math.floor((screenPxHeight - d) / 4);
 
 		for (int k = 0; k < textLayers[0][0].length; k++)
 			for (int i = 0; i < COLUMNS; i++)
 				for (int j = 0; j < ROWS; j++) {
-					double x = Math.ceil(i * fontWidth);
-					double y = Math.ceil(j * fontHeight);
-					double nx = Math.ceil((i + 1) * fontWidth);
-					double ny = Math.ceil((j + 1) * fontHeight);
+					double x = Math.floor(i * fontWidth);
+					double y = Math.floor(j * fontHeight);
+					double nx = Math.floor((i + 1) * fontWidth);
+					double ny = Math.floor((j + 1) * fontHeight);
 
 					if (k == 0) {
 						backgroundLayer[i][j] = new Rectangle(nx - x, ny - y);
@@ -160,7 +174,7 @@ public class Screen {
 	 * @param y y-coordinate at which to change the background color
 	 * @param c Desired background color
 	 */
-	public void drawToBackgroundLayer(int x, int y, Color c) {
+	public void setBackgroundColor(int x, int y, Color c) {
 		backgroundLayer[x][y].setFill(c);
 	}
 
@@ -170,7 +184,7 @@ public class Screen {
 	 * @param p Point at which to change the background color
 	 * @param c Desired background color
 	 */
-	public void drawToBackgroundLayer(Point p, Color c) {
+	public void setBackgroundColor(Point p, Color c) {
 		backgroundLayer[p.x][p.y].setFill(c);
 	}
 
@@ -231,7 +245,8 @@ public class Screen {
 	 * @param rotAnDat Object containing parameters for RotateTransition
 	 */
 	public void rotateAnimChar(int x, int y, int layer, RotateAnimData rotAnDat) {
-		RotateTransition rt = new RotateTransition(Duration.millis(rotAnDat.getDurationMillis()), textLayers[x][y][layer]);
+		RotateTransition rt = new RotateTransition(Duration.millis(rotAnDat.getDurationMillis()),
+												   textLayers[x][y][layer]);
 		rt.setFromAngle(rotAnDat.getStartAngle());
 		rt.setToAngle(rotAnDat.getEndAngle());
 		rt.setAxis(axisMap.get(rotAnDat.getAxis()));
@@ -271,7 +286,6 @@ public class Screen {
 	}
 
 	public void removeNode(Node n) {
-		if (parentPane.getChildren().contains(n))
-			parentPane.getChildren().remove(n);
+		parentPane.getChildren().remove(n);
 	}
 }

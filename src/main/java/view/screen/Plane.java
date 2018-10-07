@@ -22,7 +22,7 @@ public class Plane {
 
 	private ArrayList<Point> mouseClickHandlers;
 
-	private Point realDimensions;
+	private Point onScreenDimensions;
 	private Point topLeftInParent;
 	private Point topLeftInLocal;
 
@@ -37,7 +37,8 @@ public class Plane {
 	 * @param initTextLayers Number of text layers the plane contains, allows for layered graphics
 	 */
 	public Plane(Screen parentScreen, Point dimensions, int initTextLayers) {
-		initPlane(parentScreen, dimensions, initTextLayers, new Point(Screen.COLUMNS, Screen.ROWS), new Point(0, 0), new Point(0, 0));
+		initPlane(parentScreen, dimensions, initTextLayers,
+				  new Point(Screen.COLUMNS, Screen.ROWS), new Point(0, 0), new Point(0, 0));
 	}
 
 	/**
@@ -45,28 +46,30 @@ public class Plane {
 	 * the dimensions the plane will occupy on the parentScreen, coordinate on parentScreen on which to place the top
 	 * left coordinate of the plane, and top left coordinate to be rendered from the plane on to the parentScreen.
 	 *
-	 * @param parentScreen    Screen on which the elements of the plane will be drawn on
-	 * @param dimensions      Initial dimensions for the plane (not bound by parentScreen). It can grow as needed
-	 * @param initTextLayers  Number of text layers the plane contains, allows for layered graphics
-	 * @param realDimensions  Dimensions that the plane is allowed to occupy on the parentScreen. If the real dimensions
-	 *                        are smaller than the 'dimensions', then a portion of the plane will be displayed, and the
-	 *                        plane can be moved around to show all its contents, as needed
-	 * @param topLeftInParent Top left coordinate on which to place this Plane on the parentScreen. The space it
-	 *                        occupies will depend on this coordinate and the real dimensions
-	 * @param topLeftInLocal  Top left coordinate to of the plane to be rendered to the parentScreen. Allows for large
-	 *                        planes to be partially displayed, and moved around, in order to load big graphics and
-	 *                        move them around (e.g when the player moves)
+	 * @param parentScreen       Screen on which the elements of the plane will be drawn on
+	 * @param planeDimensions    Initial dimensions for the plane (not bound by parentScreen). It can grow as needed
+	 * @param initTextLayers     Number of text layers the plane contains, allows for layered graphics
+	 * @param onScreenDimensions Dimensions that the plane is allowed to occupy on the parentScreen. If the real
+	 *                           dimensions are smaller than the 'dimensions', then a portion of the plane will be
+	 *                           displayed, and the plane can be moved around to show all its contents, as needed
+	 * @param topLeftInParent    Top left coordinate on which to place this Plane on the parentScreen. The space it
+	 *                           occupies will depend on this coordinate and the real dimensions
+	 * @param topLeftInLocal     Top left coordinate to of the plane to be rendered to the parentScreen. Allows for
+	 *                           large planes to be partially displayed, and moved around, in order to load big
+	 *                           graphics and move them around (e.g when the player moves)
 	 */
-	public Plane(Screen parentScreen, Point dimensions, int initTextLayers, Point realDimensions, Point topLeftInParent, Point topLeftInLocal) {
-		initPlane(parentScreen, dimensions, initTextLayers, realDimensions, topLeftInParent, topLeftInLocal);
+	public Plane(Screen parentScreen, Point planeDimensions, int initTextLayers, Point onScreenDimensions,
+			Point topLeftInParent, Point topLeftInLocal) {
+		initPlane(parentScreen, planeDimensions, initTextLayers, onScreenDimensions, topLeftInParent, topLeftInLocal);
 	}
 
 	/*
 	 * Initializes the plane, called by constructors. Allows for constructors to use default values.
 	 */
-	private void initPlane(Screen parentScreen, Point dimensions, int initTextLayers, Point realDimensions, Point topLeftInParent, Point topLeftInLocal) {
+	private void initPlane(Screen parentScreen, Point dimensions, int initTextLayers, Point realDimensions, Point
+			topLeftInParent, Point topLeftInLocal) {
 		this.parentScreen = parentScreen;
-		this.realDimensions = realDimensions;
+		this.onScreenDimensions = realDimensions;
 		this.topLeftInParent = topLeftInParent;
 		this.topLeftInLocal = topLeftInLocal;
 
@@ -99,10 +102,10 @@ public class Plane {
 		mouseClickHandlers.clear();
 
 		for (int k = 0; k < getNumOfLayers(); k++)
-			for (int y = topLeftInParent.y; y < topLeftInParent.y + realDimensions.y; y++)
-				for (int x = topLeftInParent.x; x < topLeftInParent.x + realDimensions.x; x++) {
+			for (int y = topLeftInParent.y; y < topLeftInParent.y + onScreenDimensions.y; y++)
+				for (int x = topLeftInParent.x; x < topLeftInParent.x + onScreenDimensions.x; x++) {
 					if (k == 0)
-						parentScreen.drawToBackgroundLayer(x, y, Color.BLACK);
+						parentScreen.setBackgroundColor(x, y, Color.BLACK);
 					parentScreen.drawTextToLayer(x, y, k, ' ');
 					parentScreen.setTextColor(x, y, k, Color.WHITE);
 				}
@@ -187,7 +190,8 @@ public class Plane {
 	}
 
 	private boolean inVisualBounds(int x, int y) {
-		return x < topLeftInParent.x + realDimensions.x && x > topLeftInParent.x && y < topLeftInParent.y + realDimensions.y && y > topLeftInParent.y;
+		return x < topLeftInParent.x + onScreenDimensions.x && x > topLeftInParent.x
+			   && y < topLeftInParent.y + onScreenDimensions.y && y > topLeftInParent.y;
 	}
 
 	/**
@@ -275,7 +279,7 @@ public class Plane {
 	public void setBackgroundColor(int x, int y, @NotNull Color c) {
 		backgroundLayer.get(y).set(x, c);
 		if (inVisualBounds(x, y))
-			parentScreen.drawToBackgroundLayer(x, y, c);
+			parentScreen.setBackgroundColor(x, y, c);
 	}
 
 	public Color getBackgroundColor(int x, int y) {
@@ -354,13 +358,15 @@ public class Plane {
 	}
 
 	public void drawPixelBorder(int x, int y) {
-		int xCoord = parentScreen.getPixelXCoord(x, y);
-		int yCoord = parentScreen.getPixelYCoord(x, y);
+		int xCoord = parentScreen.getGlobalPixelXCoord(x + topLeftInParent.x, y + topLeftInParent.y);
+		int yCoord = parentScreen.getGlobalPixelYCoord(x + topLeftInParent.x, y + topLeftInParent.y);
 
 		Line[] borders = new Line[4];
 		borders[0] = new Line(xCoord, yCoord, xCoord + parentScreen.getPixelWidth(), yCoord);
-		borders[1] = new Line(xCoord + parentScreen.getPixelWidth(), yCoord, xCoord + parentScreen.getPixelWidth(), yCoord + parentScreen.getPixelHeight());
-		borders[2] = new Line(xCoord + parentScreen.getPixelWidth(), yCoord + parentScreen.getPixelHeight(), xCoord, yCoord + parentScreen.getPixelHeight());
+		borders[1] = new Line(xCoord + parentScreen.getPixelWidth(), yCoord, xCoord + parentScreen.getPixelWidth(),
+							  yCoord + parentScreen.getPixelHeight());
+		borders[2] = new Line(xCoord + parentScreen.getPixelWidth(), yCoord + parentScreen.getPixelHeight(), xCoord,
+							  yCoord + parentScreen.getPixelHeight());
 		borders[3] = new Line(xCoord, yCoord + parentScreen.getPixelHeight(), xCoord, yCoord);
 
 		Paint borderColor;
